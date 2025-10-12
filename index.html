@@ -14,6 +14,10 @@
         button:hover { background-color: #0056b3; }
         .toggle-form { color: #007aff; cursor: pointer; margin-top: 20px; display: block; }
         #error-message { color: #ff3b30; margin-top: 15px; min-height: 20px; text-align: left;}
+        .help-text { font-size: 0.8rem; text-align: right; margin-top: 5px; }
+        .help-text a { color: #6c757d; cursor: pointer; text-decoration: none; }
+        .help-text a:hover { text-decoration: underline; }
+        #contact-info { color: #34c759; font-weight: bold; margin-top: 15px; min-height: 20px; text-align: center;}
     </style>
 </head>
 <body>
@@ -26,8 +30,13 @@
         <div class="input-group">
             <input type="password" id="password" placeholder="Senha" required>
         </div>
+        <div class="input-group" id="secret-code-group" style="display: none;">
+            <input type="password" id="secret-code" placeholder="Código de Administrador" required>
+            <div class="help-text"><a id="help-button">Não sei o código</a></div>
+        </div>
         <button id="auth-button">Entrar</button>
         <p id="error-message"></p>
+        <p id="contact-info"></p>
         <a id="toggle-link" class="toggle-form">Não tem uma conta? Cadastre-se</a>
     </div>
 
@@ -47,15 +56,25 @@
     messagingSenderId: "623752672529",
     appId: "1:623752672529:web:ba43bfdad31f050da3c8b0"
   };
+
+        // ***************************************************************
+        // *** DEFINA SEU CÓDIGO SECRETO PARA CADASTRO AQUI ***
+        const ADMIN_SECRET_CODE = "thi1940"; 
+        // ***************************************************************
+
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
         const formTitle = document.getElementById('form-title');
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
+        const secretCodeGroup = document.getElementById('secret-code-group');
+        const secretCodeInput = document.getElementById('secret-code');
         const authButton = document.getElementById('auth-button');
         const toggleLink = document.getElementById('toggle-link');
         const errorMessage = document.getElementById('error-message');
+        const helpButton = document.getElementById('help-button');
+        const contactInfo = document.getElementById('contact-info');
 
         let isLogin = true;
 
@@ -71,16 +90,21 @@
             formTitle.textContent = isLogin ? 'Login' : 'Cadastro';
             authButton.textContent = isLogin ? 'Entrar' : 'Cadastrar';
             toggleLink.textContent = isLogin ? 'Não tem uma conta? Cadastre-se' : 'Já tem uma conta? Entre';
+            secretCodeGroup.style.display = isLogin ? 'none' : 'block';
             errorMessage.textContent = '';
+            contactInfo.textContent = '';
         };
 
         const handleAuth = () => {
             const email = emailInput.value;
             const password = passwordInput.value;
+            const secretCode = secretCodeInput.value;
             errorMessage.textContent = '';
+            contactInfo.textContent = '';
+
 
             if (!email || !password) {
-                errorMessage.textContent = 'Por favor, preencha todos os campos.';
+                errorMessage.textContent = 'Por favor, preencha e-mail e senha.';
                 return;
             }
 
@@ -92,9 +116,13 @@
                     .catch(error => {
                         errorMessage.textContent = 'E-mail ou senha incorretos.';
                     });
-            } else {
-                 if (password.length < 6) {
+            } else { // Modo Cadastro
+                if (password.length < 6) {
                     errorMessage.textContent = 'A senha deve ter no mínimo 6 caracteres.';
+                    return;
+                }
+                if (secretCode !== ADMIN_SECRET_CODE) {
+                    errorMessage.textContent = 'Código de Administrador incorreto.';
                     return;
                 }
                 auth.createUserWithEmailAndPassword(email, password)
@@ -106,9 +134,15 @@
                     });
             }
         };
+        
+        const showHelp = () => {
+            contactInfo.textContent = 'Entre em contato com thIAguinho Soluções (17)997631210';
+        };
 
         toggleLink.addEventListener('click', toggleForm);
         authButton.addEventListener('click', handleAuth);
+        helpButton.addEventListener('click', showHelp);
+
         // Permite usar a tecla Enter para submeter
         document.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
