@@ -3,41 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Minhas Compras</title>
+    <title>Plataforma thIAguinho Soluções</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f0f2f5; margin: 0; }
-        .header { background-color: #fff; padding: 15px 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .header h1 { color: #1c1e21; font-size: 1.5rem; margin: 0; }
-        .header button { background: none; border: 1px solid #ff3b30; color: #ff3b30; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s ease; }
-        .header button:hover { background-color: #ff3b30; color: white; }
-        .container { padding: 40px; max-width: 900px; margin: auto; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
-        .card { background-color: #fff; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); padding: 25px; text-align: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; text-decoration: none; display: block;}
-        .card:hover { transform: translateY(-10px); box-shadow: 0 12px 40px rgba(0,0,0,0.12); }
-        .card h2 { margin-top: 0; color: #007aff; }
-        .card p { color: #6c757d; line-height: 1.5; }
+        :root {
+            --primary-blue: #005c97;
+            --secondary-blue: #363795;
+            --accent-color: #00b4d8;
+            --background-light: #f8f9fa;
+            --card-background: #ffffff;
+            --text-dark: #212529;
+            --text-light: #6c757d;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-light);
+            margin: 0;
+            color: var(--text-dark);
+        }
+        .header {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            padding: 20px 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 { font-size: 1.8rem; margin: 0; font-weight: 700; }
+        .header button {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid white;
+            color: white;
+            padding: 8px 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .header button:hover { background: white; color: var(--primary-blue); }
+        .container { padding: 30px; max-width: 1200px; margin: auto; }
+        .section { margin-bottom: 40px; }
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent-color);
+            color: var(--primary-blue);
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        .card {
+            background-color: var(--card-background);
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            padding: 25px;
+            text-decoration: none;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #eee;
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0, 92, 151, 0.15);
+        }
+        .card-header { display: flex; align-items: center; margin-bottom: 15px; }
+        .card-icon { font-size: 2rem; margin-right: 15px; }
+        .card-title { font-size: 1.2rem; font-weight: 600; }
+        .card-description {
+            font-size: 0.95rem;
+            color: var(--text-light);
+            line-height: 1.6;
+            flex-grow: 1;
+        }
+        .card-request {
+            background: var(--secondary-blue);
+            color: white;
+        }
+        .card-request:hover {
+             box-shadow: 0 12px 30px rgba(54, 55, 149, 0.25);
+        }
+        .card-request .card-title { color: white; }
+        .card-request .card-description { color: rgba(255,255,255,0.8); }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>Escolha sua Lista</h1>
+        <h1>Plataforma thIAguinho Soluções</h1>
         <button id="logout-button">Sair</button>
     </div>
 
     <div class="container">
-        <div class="grid">
-            <a class="card" href="lista_inteligente/index.html">
-                <h2>🛒 Lista Inteligente</h2>
-                <p>Completa, com calculadora de preços, relatórios detalhados e gerenciamento avançado de itens.</p>
-            </a>
-            <a class="card" href="lista_facil/index.html">
-                <h2>🎨 Lista Fácil</h2>
-                <p>Visual e intuitiva, com sistema de "arrastar para o carrinho". Ideal para o dia a dia.</p>
-            </a>
-            <a class="card" href="lista_rapida/index.html">
-                <h2>⚡ Lista Rápida</h2>
-                <p>Apenas o essencial. Adicione itens, marque e gere um relatório de texto simples.</p>
-            </a>
+        <div class="section">
+            <h2 class="section-title">Minhas Ferramentas</h2>
+            <div class="grid">
+                <a class="card" href="lista_inteligente/index.html">
+                    <div class="card-header"><span class="card-icon">🛒</span><h3 class="card-title">Lista Inteligente</h3></div>
+                    <p class="card-description">Sua lista de compras com calculadora de preços, relatórios detalhados e gerenciamento de itens.</p>
+                </a>
+                <a class="card" href="lista_facil/index.html">
+                    <div class="card-header"><span class="card-icon">🎨</span><h3 class="card-title">Lista Fácil</h3></div>
+                    <p class="card-description">Interface visual com sistema de "arrastar para o carrinho". Simples e ideal para o dia a dia.</p>
+                </a>
+                <a class="card" href="lista_rapida/index.html">
+                    <div class="card-header"><span class="card-icon">⚡️</span><h3 class="card-title">Lista Rápida</h3></div>
+                    <p class="card-description">O essencial: adicione, marque e gere um relatório de texto simples. Sem complicações.</p>
+                </a>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Novos Facilitoides (Exemplos)</h2>
+            <div class="grid">
+                 <a class="card" href="diarrio_de_bordo_Thamis.html" target="_blank">
+                    <div class="card-header"><span class="card-icon">📅</span><h3 class="card-title">Diário de Bordo Profissional</h3></div>
+                    <p class="card-description">Ferramenta de gestão diária para líderes, com planejamento, KPIs e análise semanal automatizada.</p>
+                </a>
+                <a class="card" href="briefing.html" target="_blank">
+                    <div class="card-header"><span class="card-icon">🎯</span><h3 class="card-title">Gerador de Briefing</h3></div>
+                    <p class="card-description">Painel de comando para extrair informações estratégicas e gerar relatórios de projetos de forma estruturada.</p>
+                </a>
+                 <a class="card" href="remédios.html" target="_blank">
+                    <div class="card-header"><span class="card-icon">💊</span><h3 class="card-title">Controle de Tratamento</h3></div>
+                    <p class="card-description">Plano de tratamento pessoal para adicionar medicamentos, definir horários e acompanhar o progresso diário.</p>
+                </a>
+                <a class="card" href="guia_k_fest.html" target="_blank">
+                    <div class="card-header"><span class="card-icon">🎤</span><h3 class="card-title">Guia de Eventos</h3></div>
+                    <p class="card-description">Guia interativo para festivais, com programação, roteiro personalizado, jogos e ranking de competidores.</p>
+                </a>
+                <a class="card" href="pratos.html" target="_blank">
+                    <div class="card-header"><span class="card-icon">🍜</span><h3 class="card-title">Guia Interativo K-Food</h3></div>
+                    <p class="card-description">Guia rápido de pratos da culinária coreana com descrição, detalhes e argumentos de venda para equipes.</p>
+                </a>
+                <a class="card card-request" href="mailto:seu-email-aqui@dominio.com?subject=Solicitação de Novo Facilitoide">
+                    <div class="card-header"><span class="card-icon">💡</span><h3 class="card-title">Solicite seu Facilitoide</h3></div>
+                    <p class="card-description">Tem uma necessidade específica? Uma planilha complexa ou um processo repetitivo? Clique aqui e vamos criar uma ferramenta sob medida para você.</p>
+                </a>
+            </div>
         </div>
     </div>
 
@@ -60,16 +170,10 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
-        auth.onAuthStateChanged(user => {
-            if (!user) {
-                window.location.replace('login.html');
-            }
-        });
+        auth.onAuthStateChanged(user => { if (!user) { window.location.replace('index.html'); } });
 
         document.getElementById('logout-button').addEventListener('click', () => {
-            auth.signOut().then(() => {
-                window.location.replace('index.html');
-            });
+            auth.signOut().then(() => { window.location.replace('index.html'); });
         });
     </script>
 </body>
