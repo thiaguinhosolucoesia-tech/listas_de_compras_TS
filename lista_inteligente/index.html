@@ -258,6 +258,7 @@ const emojiMap = {
 
     // --- Padaria e Cereais ---
     'pao': '🍞',
+    'pão': '🍞', // Sinônimo
     'baguete': '🥖',
     'croissant': '🥐',
     'pretzel': '🥨',
@@ -269,10 +270,13 @@ const emojiMap = {
 
     // --- Massas e Grãos ---
     'feijao': '🫘',
+    'feijão': '🫘', // Sinônimo
     'macarrao': '🍝',
-    'massa': '🍝', // Sinônimo
+    'macarrão': '🍝', // Sinônimo
+    'massa': '🍝',
     'ramen': '🍜',
     'pao sirio': '🫓',
+    'pão sírio': '🫓', // Sinônimo
 
     // --- Carnes e Peixes ---
     'carne': '🥩',
@@ -281,6 +285,7 @@ const emojiMap = {
     'peixe': '🐟',
     'salsicha': '🌭',
     'camarao': '🍤',
+    'camarão': '🍤', // Sinônimo
     'lula': '🦑',
     'lagosta': '🦞',
     'caranguejo': '🦀',
@@ -289,20 +294,26 @@ const emojiMap = {
 
     // --- Frutas ---
     'maca': '🍎',
+    'maçã': '🍎', // Sinônimo
     'maca verde': '🍏',
+    'maçã verde': '🍏', // Sinônimo
     'pera': '🍐',
+    'pêra': '🍐', // Sinônimo (forma antiga)
     'banana': '🍌',
     'laranja': '🍊',
     'limao': '🍋',
+    'limão': '🍋', // Sinônimo
     'uva': '🍇',
     'morango': '🍓',
     'melancia': '🍉',
     'abacaxi': '🍍',
     'manga': '🥭',
     'pessego': '🍑',
+    'pêssego': '🍑', // Sinônimo
     'cereja': '🍒',
     'kiwi': '🥝',
     'melao': '🍈',
+    'melão': '🍈', // Sinônimo
     'coco': '🥥',
     'mirtilo': '🫐',
     'tomate': '🍅',
@@ -315,11 +326,13 @@ const emojiMap = {
     'alho': '🧄',
     'alface': '🥬',
     'brocolis': '🥦',
+    'brócolis': '🥦', // Sinônimo
     'milho': '🌽',
     'pepino': '🥒',
     'berinjela': '🍆',
     'abacate': '🥑',
     'pimentao': '🫑',
+    'pimentão': '🫑', // Sinônimo
     'pimenta': '🌶️',
     'cogumelo': '🍄',
     'gengibre': '🫚',
@@ -330,21 +343,27 @@ const emojiMap = {
     'azeitona': '🫒',
     'ervas': '🌿',
     'hortela': '🍃',
+    'hortelã': '🍃', // Sinônimo
     'amendoim': '🥜',
     'castanha': '🌰',
     'sal': '🧂',
     'oleo': '🫗',
+    'óleo': '🫗', // Sinônimo
     'mel': '🍯',
     'enlatado': '🥫',
     'conserva': '🫙',
 
     // --- Bebidas ---
     'cafe': '☕️',
+    'café': '☕️', // Sinônimo
     'cha': '🍵',
+    'chá': '🍵', // Sinônimo
     'chimarrao': '🧉',
+    'chimarrão': '🧉', // Sinônimo
     'suco': '🧃',
     'refrigerante': '🥤',
     'agua': '💧',
+    'água': '💧', // Sinônimo
     'gelo': '🧊',
     'cerveja': '🍺',
     'vinho': '🍷',
@@ -361,10 +380,12 @@ const emojiMap = {
     'biscoito da sorte': '🥠',
     'bolo': '🍰',
     'bolo de aniversario': '🎂',
+    'bolo de aniversário': '🎂', // Sinônimo
     'cupcake': '🧁',
     'torta': '🥧',
     'sorvete': '🍦',
     'sorvete de taca': '🍨',
+    'sorvete de taça': '🍨', // Sinônimo
     'raspadinha': '🍧',
     'donut': '🍩',
     'pudim': '🍮',
@@ -373,8 +394,10 @@ const emojiMap = {
     // --- Pratos Prontos e Congelados ---
     'pizza': '🍕',
     'hamburguer': '🍔',
+    'hambúrguer': '🍔', // Sinônimo
     'batata frita': '🍟',
     'sanduiche': '🥪',
+    'sanduíche': '🥪', // Sinônimo
     'taco': '🌮',
     'burrito': '🌯',
     'kebab': '🥙',
@@ -385,6 +408,7 @@ const emojiMap = {
 
     // --- Limpeza ---
     'sabao': '🧼',
+    'sabão': '🧼', // Sinônimo
     'detergente': '🧽',
     'esponja': '🧽',
     'limpeza': '🧹',
@@ -397,22 +421,28 @@ const emojiMap = {
     'shampoo': '🧴',
     'papel': '🧻',
     'papel higienico': '🧻',
+    'papel higiênico': '🧻', // Sinônimo
     'escova de dentes': '🪥',
     'lamina de barbear': '🪒',
+    'lâmina de barbear': '🪒', // Sinônimo
     'curativo': '🩹',
     'remedio': '💊',
+    'remédio': '💊', // Sinônimo
 
     // --- Utilidades e Outros ---
     'racao para pet': '🦴',
+    'ração para pet': '🦴', // Sinônimo
     'cigarro': '🚬',
     'vela': '🕯️',
     'lampada': '💡',
+    'lâmpada': '💡', // Sinônimo
     'pilha': '🔋',
     'planta': '🪴',
 
     // --- Padrão ---
     'default': '🛒'
 };
+
     const getEmojiForItem = (nome) => { const nomeLower = nome.toLowerCase(); for (const key in emojiMap) if (nomeLower.includes(key)) return emojiMap[key]; return emojiMap.default; };
     const store = { 
         loadUI: () => {
