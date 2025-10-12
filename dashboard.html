@@ -12,7 +12,7 @@
             --primary-blue: #005c97;
             --secondary-blue: #363795;
             --accent-color: #00b4d8;
-            --background-light: #f8f9fa;
+            --background-light: #f0f2f5; /* Fundo mais suave */
             --card-background: #ffffff;
             --text-dark: #212529;
             --text-light: #6c757d;
@@ -45,15 +45,54 @@
         }
         .header button:hover { background: white; color: var(--primary-blue); }
         .container { padding: 30px; max-width: 1200px; margin: auto; }
-        .section { margin-bottom: 50px; }
-        .section-title {
+
+        /* Estilo do Acordeão (Seções Interativas) */
+        .accordion {
+            background-color: var(--card-background);
+            color: var(--primary-blue);
+            cursor: pointer;
+            padding: 20px 25px;
+            width: 100%;
+            border: 1px solid #e9ecef;
+            border-radius: 15px;
+            text-align: left;
+            outline: none;
             font-size: 1.6rem;
             font-weight: 600;
-            margin-bottom: 25px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid var(--accent-color);
-            color: var(--primary-blue);
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
+        .accordion:hover, .accordion.active {
+            color: var(--secondary-blue);
+            box-shadow: 0 8px 25px rgba(0, 92, 151, 0.1);
+        }
+        .accordion:after {
+            content: '\\002B'; /* Símbolo de + */
+            font-size: 2rem;
+            color: var(--accent-color);
+            transition: transform 0.3s ease;
+        }
+        .accordion.active:after {
+            content: "\\2212"; /* Símbolo de - */
+            transform: rotate(180deg);
+        }
+
+        /* Painel de Conteúdo do Acordeão */
+        .panel {
+            padding: 0;
+            background-color: transparent;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+        }
+        .panel-content {
+             padding: 30px 10px;
+        }
+        
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -62,7 +101,7 @@
         .card {
             background-color: var(--card-background);
             border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.07);
             text-decoration: none;
             color: var(--text-dark);
             display: flex;
@@ -73,7 +112,7 @@
         }
         .card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 12px 30px rgba(0, 92, 151, 0.15);
+            box-shadow: 0 12px 30px rgba(0, 92, 151, 0.12);
         }
         .card-content {
             padding: 25px;
@@ -93,12 +132,20 @@
         .card-request {
             background: var(--secondary-blue);
             color: white;
+            border: none;
         }
         .card-request:hover {
              box-shadow: 0 12px 30px rgba(54, 55, 149, 0.25);
         }
         .card-request .card-title { color: white; }
         .card-request .card-description { color: rgba(255,255,255,0.8); }
+        .intro-text {
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--text-light);
+            max-width: 800px;
+            margin: 0 auto 30px auto;
+        }
     </style>
 </head>
 <body>
@@ -109,74 +156,83 @@
 
     <div class="container">
         
-        <div class="section">
-            <h2 class="section-title">Listas de Compras</h2>
-            <div class="grid">
-                <a class="card" href="listas_de_compras/lista_inteligente/index.html">
-                    <div class="card-content">
-                        <div class="card-header"><span class="card-icon">🛒</span><h3 class="card-title">Lista Inteligente</h3></div>
-                        <p class="card-description">Sua lista de compras com calculadora de preços, relatórios detalhados e gerenciamento de itens.</p>
-                    </div>
-                </a>
-                <a class="card" href="listas_de_compras/lista_facil/index.html">
-                    <div class="card-content">
-                        <div class="card-header"><span class="card-icon">🎨</span><h3 class="card-title">Lista Fácil</h3></div>
-                        <p class="card-description">Interface visual com sistema de "arrastar para o carrinho". Simples e ideal para o dia a dia.</p>
-                    </div>
-                </a>
-                <a class="card" href="listas_de_compras/lista_rapida/index.html">
-                    <div class="card-content">
-                        <div class="card-header"><span class="card-icon">⚡️</span><h3 class="card-title">Lista Rápida</h3></div>
-                        <p class="card-description">O essencial: adicione, marque e gere um relatório de texto simples. Sem complicações.</p>
-                    </div>
-                </a>
+        <p class="intro-text">Bem-vindo ao seu hub de automação de rotinas. Selecione uma categoria para explorar os facilitoides disponíveis.</p>
+
+        <button class="accordion">Listas de Compras</button>
+        <div class="panel">
+            <div class="panel-content">
+                <div class="grid">
+                    <a class="card" href="listas_de_compras/lista_inteligente/index.html">
+                        <div class="card-content">
+                            <div class="card-header"><span class="card-icon">🛒</span><h3 class="card-title">Lista Inteligente</h3></div>
+                            <p class="card-description">Sua lista de compras com calculadora de preços, relatórios detalhados e gerenciamento de itens.</p>
+                        </div>
+                    </a>
+                    <a class="card" href="listas_de_compras/lista_facil/index.html">
+                        <div class="card-content">
+                            <div class="card-header"><span class="card-icon">🎨</span><h3 class="card-title">Lista Fácil</h3></div>
+                            <p class="card-description">Interface visual com sistema de "arrastar para o carrinho". Simples e ideal para o dia a dia.</p>
+                        </div>
+                    </a>
+                    <a class="card" href="listas_de_compras/lista_rapida/index.html">
+                        <div class="card-content">
+                            <div class="card-header"><span class="card-icon">⚡️</span><h3 class="card-title">Lista Rápida</h3></div>
+                            <p class="card-description">O essencial: adicione, marque e gere um relatório de texto simples. Sem complicações.</p>
+                        </div>
+                    </a>
+                </div>
             </div>
         </div>
 
-        <div class="section">
-            <h2 class="section-title">Formulários Interativos para Facilitar a Rotina</h2>
-            <div class="grid">
-                 <a class="card" href="formularios_interativos/diario_bordo.html" target="_blank">
-                    <div class="card-content">
-                        <div class="card-header"><span class="card-icon">📅</span><h3 class="card-title">Diário de Bordo Profissional</h3></div>
-                        <p class="card-description">Ferramenta de gestão diária para líderes, com planejamento, KPIs e análise semanal automatizada.</p>
-                    </div>
-                </a>
-                 <a class="card" href="formularios_interativos/controle_remedios.html" target="_blank">
-                    <div class="card-content">
-                        <div class="card-header"><span class="card-icon">💊</span><h3 class="card-title">Controle de Tratamento</h3></div>
-                        <p class="card-description">Plano de tratamento pessoal para adicionar medicamentos, definir horários e acompanhar o progresso diário.</p>
-                    </div>
-                </a>
-                <a class="card" href="formularios_interativos/gerador_briefing.html" target="_blank">
-                    <div class="card-content">
-                        <div class="card-header"><span class="card-icon">🎯</span><h3 class="card-title">Gerador de Briefing</h3></div>
-                        <p class="card-description">Painel de comando para extrair informações estratégicas e gerar relatórios de projetos de forma estruturada.</p>
-                    </div>
-                </a>
-                <a class="card" href="formularios_interativos/guia_eventos.html" target="_blank">
-                    <div class="card-content">
-                        <div class="card-header"><span class="card-icon">🎤</span><h3 class="card-title">Guia de Eventos</h3></div>
-                        <p class="card-description">Guia interativo para festivais, com programação, roteiro personalizado, jogos e ranking de competidores.</p>
-                    </div>
-                </a>
-                <a class="card" href="formularios_interativos/guia_k_food.html" target="_blank">
-                    <div class="card-content">
-                        <div class="card-header"><span class="card-icon">🍜</span><h3 class="card-title">Guia Interativo K-Food</h3></div>
-                        <p class="card-description">Guia rápido de pratos da culinária coreana com descrição, detalhes e argumentos de venda para equipes.</p>
-                    </div>
-                </a>
+        <button class="accordion">Formulários Interativos</button>
+        <div class="panel">
+            <div class="panel-content">
+                <div class="grid">
+                     <a class="card" href="formularios_interativos/diario_bordo.html">
+                        <div class="card-content">
+                            <div class="card-header"><span class="card-icon">📅</span><h3 class="card-title">Diário de Bordo Profissional</h3></div>
+                            <p class="card-description">Ferramenta de gestão diária para líderes, com planejamento, KPIs e análise semanal automatizada.</p>
+                        </div>
+                    </a>
+                     <a class="card" href="formularios_interativos/controle_remedios.html">
+                        <div class="card-content">
+                            <div class="card-header"><span class="card-icon">💊</span><h3 class="card-title">Controle de Tratamento</h3></div>
+                            <p class="card-description">Plano de tratamento pessoal para adicionar medicamentos, definir horários e acompanhar o progresso diário.</p>
+                        </div>
+                    </a>
+                    <a class="card" href="formularios_interativos/gerador_briefing.html">
+                        <div class="card-content">
+                            <div class="card-header"><span class="card-icon">🎯</span><h3 class="card-title">Gerador de Briefing</h3></div>
+                            <p class="card-description">Painel de comando para extrair informações estratégicas e gerar relatórios de projetos de forma estruturada.</p>
+                        </div>
+                    </a>
+                    <a class="card" href="formularios_interativos/guia_eventos.html">
+                        <div class="card-content">
+                            <div class="card-header"><span class="card-icon">🎤</span><h3 class="card-title">Guia de Eventos</h3></div>
+                            <p class="card-description">Guia interativo para festivais, com programação, roteiro personalizado, jogos e ranking de competidores.</p>
+                        </div>
+                    </a>
+                    <a class="card" href="formularios_interativos/guia_k_food.html">
+                        <div class="card-content">
+                            <div class="card-header"><span class="card-icon">🍜</span><h3 class="card-title">Guia Interativo K-Food</h3></div>
+                            <p class="card-description">Guia rápido de pratos da culinária coreana com descrição, detalhes e argumentos de venda para equipes.</p>
+                        </div>
+                    </a>
+                </div>
             </div>
         </div>
         
-        <div class="section">
-             <div class="grid">
-                <a class="card card-request" href="mailto:seu-email-aqui@dominio.com?subject=Solicitação de Novo Facilitoide">
-                     <div class="card-content">
-                        <div class="card-header"><span class="card-icon">💡</span><h3 class="card-title">Solicite seu Facilitoide</h3></div>
-                        <p class="card-description">Tem uma necessidade específica? Uma planilha complexa ou um processo repetitivo? Clique aqui e vamos criar uma ferramenta sob medida para você.</p>
-                    </div>
-                </a>
+        <button class="accordion">Precisa de Mais?</button>
+        <div class="panel">
+            <div class="panel-content">
+                <div class="grid">
+                    <a class="card card-request" href="mailto:seu-email-aqui@dominio.com?subject=Solicitação de Novo Facilitoide">
+                         <div class="card-content">
+                            <div class="card-header"><span class="card-icon">💡</span><h3 class="card-title">Solicite seu Facilitoide</h3></div>
+                            <p class="card-description">Tem uma necessidade específica? Uma planilha complexa ou um processo repetitivo? Clique aqui e vamos criar uma ferramenta sob medida para você.</p>
+                        </div>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -199,12 +255,34 @@
 
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-
         auth.onAuthStateChanged(user => { if (!user) { window.location.replace('index.html'); } });
-
         document.getElementById('logout-button').addEventListener('click', () => {
             auth.signOut().then(() => { window.location.replace('index.html'); });
         });
+
+        // Lógica do Acordeão
+        const accordions = document.getElementsByClassName("accordion");
+        for (let i = 0; i < accordions.length; i++) {
+            accordions[i].addEventListener("click", function() {
+                // Fecha todos os outros painéis para manter apenas um aberto
+                for (let j = 0; j < accordions.length; j++) {
+                    if (accordions[j] !== this) {
+                        accordions[j].classList.remove("active");
+                        let panelToClose = accordions[j].nextElementSibling;
+                        panelToClose.style.maxHeight = null;
+                    }
+                }
+
+                // Abre ou fecha o painel clicado
+                this.classList.toggle("active");
+                let panel = this.nextElementSibling;
+                if (panel.style.maxHeight) {
+                    panel.style.maxHeight = null;
+                } else {
+                    panel.style.maxHeight = panel.scrollHeight + "px";
+                }
+            });
+        }
     </script>
 </body>
 </html>
