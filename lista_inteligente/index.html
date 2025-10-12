@@ -248,7 +248,171 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- Utilitários ---
-    const emojiMap = { 'leite': '🥛', 'cafe': '☕️', 'pao': '🍞', 'queijo': '🧀', 'maca': '🍎', 'banana': '🍌', 'laranja': '🍊', 'uva': '🍇', 'morango': '🍓', 'abacaxi': '🍍', 'melancia': '🍉', 'tomate': '🍅', 'cenoura': '🥕', 'batata': '🥔', 'cebola': '🧅', 'alface': '🥬', 'brocolis': '🥦', 'carne': '🥩', 'frango': '🍗', 'peixe': '🐟', 'ovo': '🥚', 'bacon': '🥓', 'arroz': '🍚', 'feijao': '🫘', 'macarrao': '🍝', 'massa': '🍝', 'refrigerante': '🥤', 'suco': '🧃', 'agua': '💧', 'cerveja': '🍺', 'vinho': '🍷', 'sabao': '🧼', 'shampoo': '🧴', 'detergente': '🧽', 'limpeza': '🧹', 'papel': '🧻', 'chocolate': '🍫', 'bolo': '🍰', 'sorvete': '🍦', 'doce': '🍬', 'biscoito': '🍪', 'pizza': '🍕', 'hamburguer': '🍔', 'default': '🛒' };
+const emojiMap = {
+    // --- Laticínios e Frios ---
+    'leite': '🥛',
+    'queijo': '🧀',
+    'manteiga': '🧈',
+    'ovo': '🥚',
+    'bacon': '🥓',
+
+    // --- Padaria e Cereais ---
+    'pao': '🍞',
+    'baguete': '🥖',
+    'croissant': '🥐',
+    'pretzel': '🥨',
+    'bagel': '🥯',
+    'panqueca': '🥞',
+    'waffle': '🧇',
+    'arroz': '🍚',
+    'cereal': '🥣',
+
+    // --- Massas e Grãos ---
+    'feijao': '🫘',
+    'macarrao': '🍝',
+    'massa': '🍝', // Sinônimo
+    'ramen': '🍜',
+    'pao sirio': '🫓',
+
+    // --- Carnes e Peixes ---
+    'carne': '🥩',
+    'pernil': '🍖',
+    'frango': '🍗',
+    'peixe': '🐟',
+    'salsicha': '🌭',
+    'camarao': '🍤',
+    'lula': '🦑',
+    'lagosta': '🦞',
+    'caranguejo': '🦀',
+    'ostra': '🦪',
+    'sushi': '🍣',
+
+    // --- Frutas ---
+    'maca': '🍎',
+    'maca verde': '🍏',
+    'pera': '🍐',
+    'banana': '🍌',
+    'laranja': '🍊',
+    'limao': '🍋',
+    'uva': '🍇',
+    'morango': '🍓',
+    'melancia': '🍉',
+    'abacaxi': '🍍',
+    'manga': '🥭',
+    'pessego': '🍑',
+    'cereja': '🍒',
+    'kiwi': '🥝',
+    'melao': '🍈',
+    'coco': '🥥',
+    'mirtilo': '🫐',
+    'tomate': '🍅',
+
+    // --- Verduras e Legumes ---
+    'cenoura': '🥕',
+    'batata': '🥔',
+    'batata doce': '🍠',
+    'cebola': '🧅',
+    'alho': '🧄',
+    'alface': '🥬',
+    'brocolis': '🥦',
+    'milho': '🌽',
+    'pepino': '🥒',
+    'berinjela': '🍆',
+    'abacate': '🥑',
+    'pimentao': '🫑',
+    'pimenta': '🌶️',
+    'cogumelo': '🍄',
+    'gengibre': '🫚',
+    'ervilha': '🫛',
+    'salada': '🥗',
+
+    // --- Mercearia e Conservas ---
+    'azeitona': '🫒',
+    'ervas': '🌿',
+    'hortela': '🍃',
+    'amendoim': '🥜',
+    'castanha': '🌰',
+    'sal': '🧂',
+    'oleo': '🫗',
+    'mel': '🍯',
+    'enlatado': '🥫',
+    'conserva': '🫙',
+
+    // --- Bebidas ---
+    'cafe': '☕️',
+    'cha': '🍵',
+    'chimarrao': '🧉',
+    'suco': '🧃',
+    'refrigerante': '🥤',
+    'agua': '💧',
+    'gelo': '🧊',
+    'cerveja': '🍺',
+    'vinho': '🍷',
+    'espumante': '🍾',
+    'whisky': '🥃',
+    'coquetel': '🍸',
+    'drink': '🍹',
+
+    // --- Doces e Sobremesas ---
+    'chocolate': '🍫',
+    'doce': '🍬',
+    'pirulito': '🍭',
+    'biscoito': '🍪',
+    'biscoito da sorte': '🥠',
+    'bolo': '🍰',
+    'bolo de aniversario': '🎂',
+    'cupcake': '🧁',
+    'torta': '🥧',
+    'sorvete': '🍦',
+    'sorvete de taca': '🍨',
+    'raspadinha': '🍧',
+    'donut': '🍩',
+    'pudim': '🍮',
+    'pipoca': '🍿',
+
+    // --- Pratos Prontos e Congelados ---
+    'pizza': '🍕',
+    'hamburguer': '🍔',
+    'batata frita': '🍟',
+    'sanduiche': '🥪',
+    'taco': '🌮',
+    'burrito': '🌯',
+    'kebab': '🥙',
+    'falafel': '🧆',
+    'onigiri': '🍙',
+    'comida chinesa': '🥡',
+    'fondue': '🫕',
+
+    // --- Limpeza ---
+    'sabao': '🧼',
+    'detergente': '🧽',
+    'esponja': '🧽',
+    'limpeza': '🧹',
+    'vassoura': '🧹',
+    'balde': '🪣',
+    'cesto': '🧺',
+    'saco de lixo': '🗑️',
+
+    // --- Higiene e Saúde ---
+    'shampoo': '🧴',
+    'papel': '🧻',
+    'papel higienico': '🧻',
+    'escova de dentes': '🪥',
+    'lamina de barbear': '🪒',
+    'curativo': '🩹',
+    'remedio': '💊',
+
+    // --- Utilidades e Outros ---
+    'racao para pet': '🦴',
+    'cigarro': '🚬',
+    'vela': '🕯️',
+    'lampada': '💡',
+    'pilha': '🔋',
+    'planta': '🪴',
+
+    // --- Padrão ---
+    'default': '🛒'
+};
     const getEmojiForItem = (nome) => { const nomeLower = nome.toLowerCase(); for (const key in emojiMap) if (nomeLower.includes(key)) return emojiMap[key]; return emojiMap.default; };
     const store = { 
         loadUI: () => {
