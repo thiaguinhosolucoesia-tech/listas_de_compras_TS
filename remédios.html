@@ -1,0 +1,427 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Plano de Tratamento</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f7f8fc; -webkit-tap-highlight-color: transparent; }
+        .btn-principal, .btn-secundario, .btn-icon { transition: all 0.2s ease-in-out; }
+        .btn-principal:active, .btn-secundario:active, .btn-icon:active { transform: scale(0.95); filter: brightness(0.9); }
+        .fade-in-scale { animation: fadeInScale 0.4s ease-out forwards; }
+        @keyframes fadeInScale { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .card-concluido { background-color: #e8f5e9; border-left-color: #4caf50; opacity: 0.8; }
+        .card-concluido .info-remedio { text-decoration: line-through; color: #555; }
+        @media print {
+            body * { visibility: hidden; }
+            #relatorio-imprimir, #relatorio-imprimir * { visibility: visible; }
+            #relatorio-imprimir { position: absolute; left: 0; top: 0; width: 100%; }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body class="text-gray-900">
+
+    <div class="container mx-auto max-w-3xl p-4 sm:p-6">
+
+        <header class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold text-blue-800">Meu Plano de Tratamento</h1>
+            <p class="text-gray-600 text-lg mt-1">Hoje é <span id="current-date" class="font-semibold"></span></p>
+        </header>
+
+        <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mb-10">
+            <button id="btn-open-modal" class="btn-principal bg-blue-600 text-white font-bold py-4 px-8 rounded-full shadow-lg text-xl flex items-center gap-3 w-full sm:w-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" /></svg>
+                Adicionar Tratamento
+            </button>
+            <button id="btn-open-relatorio" class="btn-secundario bg-white text-blue-600 border-2 border-blue-500 font-bold py-3 px-6 rounded-full shadow-sm text-lg flex items-center gap-3 w-full sm:w-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                Ver Relatório
+            </button>
+        </div>
+
+        <main id="checklist-container" class="space-y-10"></main>
+        
+        <div id="placeholder" class="text-center bg-white p-10 rounded-2xl shadow-sm mt-10">
+            <div class="text-6xl">💊</div>
+            <p class="mt-4 text-xl text-gray-600">Nenhum tratamento ativo para hoje.</p>
+            <p class="text-gray-500 mt-1">Clique no botão azul acima para começar!</p>
+        </div>
+        
+        <footer class="mt-12 text-center">
+            <h3 class="text-xl font-semibold mb-3">Progresso do Dia</h3>
+            <div class="w-full bg-gray-200 rounded-full h-5 shadow-inner">
+                <div id="progress-bar" class="bg-green-500 h-5 rounded-full transition-all duration-500 flex items-center justify-center text-white font-bold" style="width: 0%"></div>
+            </div>
+            <p id="progress-text" class="text-lg text-gray-600 mt-3"></p>
+        </footer>
+
+    </div>
+
+    <!-- Modal para Adicionar/Editar Tratamento -->
+    <div id="med-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg transform transition-all" id="modal-content">
+            <form id="form-remedio" class="p-6 sm:p-8 space-y-5">
+                <input type="hidden" id="tratamento-id">
+                <h2 id="modal-title" class="text-2xl font-bold text-center">Novo Tratamento</h2>
+                <div>
+                    <label for="nome-remedio" class="block text-lg font-medium">Nome do Remédio</label>
+                    <input type="text" id="nome-remedio" placeholder="Ex: Azitromicina" required class="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg text-lg">
+                </div>
+                <div>
+                    <label for="dosagem-remedio" class="block text-lg font-medium">Dose</label>
+                    <input type="text" id="dosagem-remedio" placeholder="Ex: 1 comprimido de 500mg" required class="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg text-lg">
+                </div>
+                <div>
+                    <label for="duracao-tratamento" class="block text-lg font-medium">Tomar por quantos dias?</label>
+                    <input type="number" id="duracao-tratamento" placeholder="Ex: 5" min="1" required class="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg text-lg">
+                </div>
+                <div>
+                    <label class="block text-lg font-medium">Quais os horários?</label>
+                    <div id="horarios-container" class="mt-2 space-y-2"></div>
+                    <button type="button" id="btn-add-horario" class="mt-2 w-full text-blue-600 font-semibold border-2 border-dashed border-blue-400 rounded-lg py-2 hover:bg-blue-50 transition">+ Adicionar horário</button>
+                </div>
+                <div>
+                    <label for="instrucoes-remedio" class="block text-lg font-medium">Como tomar?</label>
+                    <select id="instrucoes-remedio" required class="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg text-lg bg-white">
+                        <option value="Depois de comer">Depois de comer 🍳</option>
+                        <option value="Antes de comer (jejum)">Antes de comer (jejum) 🕒</option>
+                        <option value="Com bastante água">Com bastante água 💧</option>
+                        <option value="Não importa">Não importa 👍</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-4 pt-4">
+                    <button type="button" id="btn-cancel-modal" class="px-8 py-3 bg-gray-200 rounded-lg text-lg">Cancelar</button>
+                    <button type="submit" class="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg text-lg">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Relatório -->
+    <div id="relatorio-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all flex flex-col" style="max-height: 90vh;">
+            <div id="relatorio-imprimir" class="p-6 sm:p-8">
+                <h2 class="text-2xl font-bold text-center mb-1">Relatório de Tratamento</h2>
+                <p class="text-center text-gray-500 mb-6">Progresso geral até <span id="relatorio-data"></span></p>
+                <div id="relatorio-conteudo" class="space-y-6 overflow-y-auto" style="max-height: 60vh;"></div>
+            </div>
+            <div class="flex justify-end gap-4 p-4 bg-gray-50 border-t rounded-b-2xl no-print">
+                <button type="button" id="btn-fechar-relatorio" class="px-6 py-2 bg-gray-200 rounded-lg">Fechar</button>
+                <button type="button" id="btn-salvar-relatorio" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg">Salvar/Imprimir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Conclusão do Dia -->
+    <div id="modal-conclusao" class="fixed inset-0 bg-green-600 bg-opacity-90 flex items-center justify-center p-4 hidden z-50">
+         <div class="text-center text-white">
+            <div class="text-9xl animate-bounce">🎉</div>
+            <h2 class="text-4xl sm:text-5xl font-bold mt-4">Tudo Certo por Hoje!</h2>
+            <p class="text-xl sm:text-2xl mt-4 max-w-lg">Parabéns pelo seu compromisso! 👏</p>
+            <button id="btn-reset" class="btn-principal mt-10 bg-white text-green-600 font-bold py-4 px-8 rounded-full shadow-lg text-xl">Ok</button>
+        </div>
+    </div>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- ELEMENTOS DO DOM ---
+        const checklistContainer = document.getElementById('checklist-container');
+        const placeholder = document.getElementById('placeholder');
+        const medModal = document.getElementById('med-modal');
+        const formRemedio = document.getElementById('form-remedio');
+        const horariosContainer = document.getElementById('horarios-container');
+        const btnAddHorario = document.getElementById('btn-add-horario');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const modalConclusao = document.getElementById('modal-conclusao');
+        const relatorioModal = document.getElementById('relatorio-modal');
+        const relatorioConteudo = document.getElementById('relatorio-conteudo');
+
+        // --- ESTRUTURA DE DADOS ---
+        let tratamentos = JSON.parse(localStorage.getItem('tratamentos_v6')) || [];
+        let dosesDiarias = JSON.parse(localStorage.getItem('dosesDiarias_v6')) || [];
+        
+        // --- INICIALIZAÇÃO E GERAÇÃO DIÁRIA ---
+        const init = () => {
+            const hoje = new Date().toLocaleDateString('pt-BR');
+            document.getElementById('current-date').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+            
+            const ultimaGeracao = localStorage.getItem('ultimaGeracao_v6');
+            if (ultimaGeracao !== hoje) {
+                gerarDosesParaHoje();
+                localStorage.setItem('ultimaGeracao_v6', hoje);
+            }
+
+            renderDosesDiarias();
+            setupEventListeners();
+        };
+
+        const gerarDosesParaHoje = () => {
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
+            dosesDiarias = [];
+
+            tratamentos.forEach(trat => {
+                const dataInicio = new Date(trat.dataInicio);
+                dataInicio.setHours(0, 0, 0, 0);
+                
+                const diffTime = hoje - dataInicio;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                if (diffDays >= 0 && diffDays < trat.duracao) {
+                    trat.horarios.forEach(horario => {
+                        dosesDiarias.push({
+                            id: `${trat.id}-${horario}`,
+                            tratamentoId: trat.id,
+                            nome: trat.nome,
+                            dosagem: trat.dosagem,
+                            horario: horario,
+                            instrucoes: trat.instrucoes,
+                            diaAtual: diffDays + 1,
+                            duracaoTotal: trat.duracao,
+                            concluido: false
+                        });
+                    });
+                }
+            });
+            salvarDoses();
+        };
+
+        // --- RENDERIZAÇÃO DA UI ---
+        const renderDosesDiarias = () => {
+            checklistContainer.innerHTML = '';
+            
+            if (dosesDiarias.length === 0) {
+                placeholder.style.display = 'block';
+                checklistContainer.style.display = 'none';
+            } else {
+                placeholder.style.display = 'none';
+                checklistContainer.style.display = 'block';
+
+                const groupedMeds = { 'Manhã ☀️': [], 'Tarde 🌇': [], 'Noite 🌙': [] };
+                dosesDiarias.sort((a, b) => a.horario.localeCompare(b.horario));
+                dosesDiarias.forEach(dose => {
+                    const hour = parseInt(dose.horario.split(':')[0], 10);
+                    if (hour >= 4 && hour < 12) groupedMeds['Manhã ☀️'].push(dose);
+                    else if (hour >= 12 && hour < 18) groupedMeds['Tarde 🌇'].push(dose);
+                    else groupedMeds['Noite 🌙'].push(dose);
+                });
+
+                for (const periodo in groupedMeds) {
+                    if (groupedMeds[periodo].length > 0) {
+                        const section = document.createElement('section');
+                        section.className = 'fade-in-scale';
+                        section.innerHTML = `<h2 class="text-3xl font-bold text-blue-700 pb-2 mb-4">${periodo}</h2>`;
+                        groupedMeds[periodo].forEach(dose => section.appendChild(createMedCard(dose)));
+                        checklistContainer.appendChild(section);
+                    }
+                }
+            }
+            updateProgress();
+        };
+
+        const createMedCard = (dose) => {
+            const card = document.createElement('div');
+            card.className = 'bg-white rounded-2xl shadow-lg border-l-8 border-gray-300 transition-all duration-300 cursor-pointer p-5 flex items-center gap-5 fade-in-scale';
+            card.dataset.id = dose.id;
+            if (dose.concluido) card.classList.add('card-concluido');
+            card.innerHTML = `
+                <div class="text-5xl flex-shrink-0">${dose.concluido ? '✅' : '⬜️'}</div>
+                <div class="flex-grow info-remedio">
+                    <h3 class="font-bold text-2xl">${dose.nome} <span class="text-lg font-medium text-gray-500">(Dia ${dose.diaAtual}/${dose.duracaoTotal})</span></h3>
+                    <p class="text-gray-600 text-lg mt-1">💊 ${dose.dosagem}</p>
+                    <p class="text-gray-600 text-lg">⏰ ${dose.horario}</p>
+                    <p class="text-gray-600 text-lg">🍽️ ${dose.instrucoes}</p>
+                </div>`;
+            return card;
+        };
+
+        // --- MANIPULAÇÃO DE DADOS ---
+        const salvarTratamentos = () => localStorage.setItem('tratamentos_v6', JSON.stringify(tratamentos));
+        const salvarDoses = () => localStorage.setItem('dosesDiarias_v6', JSON.stringify(dosesDiarias));
+
+        const toggleConcluido = (id) => {
+            const dose = dosesDiarias.find(d => d.id === id);
+            if (dose) {
+                dose.concluido = !dose.concluido;
+                salvarDoses();
+                renderDosesDiarias();
+                checkAllCompleted();
+            }
+        };
+
+        const deletarTratamento = (id) => {
+            tratamentos = tratamentos.filter(t => t.id !== id);
+            salvarTratamentos();
+            gerarDosesParaHoje(); // Re-gera as doses do dia sem o tratamento excluído
+            renderDosesDiarias();
+            renderRelatorio(); // Atualiza o relatório
+        };
+        
+        // --- LÓGICA DE UI E MODAIS ---
+        const updateProgress = () => {
+            const total = dosesDiarias.length;
+            const concluidos = dosesDiarias.filter(d => d.concluido).length;
+            const percent = total > 0 ? Math.round((concluidos / total) * 100) : 0;
+            progressBar.style.width = `${percent}%`;
+            progressBar.textContent = total > 0 ? `${percent}%` : '';
+            progressText.textContent = total > 0 ? `Você tomou ${concluidos} de ${total} remédios hoje.` : 'Nenhum remédio para hoje.';
+        };
+        
+        const checkAllCompleted = () => {
+            if (dosesDiarias.length > 0 && dosesDiarias.every(d => d.concluido)) {
+                modalConclusao.classList.remove('hidden');
+            }
+        };
+
+        const renderRelatorio = () => {
+            document.getElementById('relatorio-data').textContent = new Date().toLocaleDateString('pt-BR');
+            relatorioConteudo.innerHTML = '';
+
+            if (tratamentos.length === 0) {
+                relatorioConteudo.innerHTML = '<p class="text-center text-gray-500">Nenhum tratamento cadastrado.</p>';
+                return;
+            }
+
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
+
+            tratamentos.forEach(trat => {
+                const dataInicio = new Date(trat.dataInicio);
+                dataInicio.setHours(0, 0, 0, 0);
+                const diffTime = hoje - dataInicio;
+                const diasPassados = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+                const diaAtual = Math.min(diasPassados + 1, trat.duracao);
+                const progresso = Math.min(100, Math.round((diaAtual / trat.duracao) * 100));
+
+                const itemRelatorio = document.createElement('div');
+                itemRelatorio.className = 'p-4 border rounded-lg relative';
+                itemRelatorio.innerHTML = `
+                    <div class="absolute top-2 right-2 flex gap-2 no-print">
+                        <button class="btn-edit btn-icon p-2 text-gray-500 hover:text-blue-600" data-id="${trat.id}" title="Editar"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg></button>
+                        <button class="btn-delete btn-icon p-2 text-gray-500 hover:text-red-600" data-id="${trat.id}" title="Excluir"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg></button>
+                    </div>
+                    <h3 class="font-bold text-xl">${trat.nome} <span class="text-base font-medium text-gray-600">- ${trat.dosagem}</span></h3>
+                    <p class="text-sm text-gray-500">Início em: ${dataInicio.toLocaleDateString('pt-BR')}</p>
+                    <div class="mt-3">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-lg font-semibold text-blue-700">Progresso: Dia ${diaAtual} de ${trat.duracao}</span>
+                            <span class="font-bold">${progresso}%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-4"><div class="bg-blue-600 h-4 rounded-full" style="width: ${progresso}%"></div></div>
+                    </div>`;
+                relatorioConteudo.appendChild(itemRelatorio);
+            });
+        };
+
+        const createHorarioInput = (horario = '') => {
+            const div = document.createElement('div');
+            div.className = 'flex items-center gap-2';
+            div.innerHTML = `<input type="time" value="${horario}" required class="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg"><button type="button" class="btn-remove-horario text-red-500 hover:text-red-700 font-bold text-2xl px-2">&times;</button>`;
+            horariosContainer.appendChild(div);
+            div.querySelector('.btn-remove-horario').addEventListener('click', () => { if (horariosContainer.children.length > 1) div.remove(); });
+        };
+
+        const openModalForEdit = (id) => {
+            const trat = tratamentos.find(t => t.id === id);
+            if (!trat) return;
+
+            formRemedio.reset();
+            document.getElementById('tratamento-id').value = trat.id;
+            document.getElementById('modal-title').textContent = "Editar Tratamento";
+            document.getElementById('nome-remedio').value = trat.nome;
+            document.getElementById('dosagem-remedio').value = trat.dosagem;
+            document.getElementById('duracao-tratamento').value = trat.duracao;
+            document.getElementById('instrucoes-remedio').value = trat.instrucoes;
+            
+            horariosContainer.innerHTML = '';
+            trat.horarios.forEach(h => createHorarioInput(h));
+
+            relatorioModal.classList.add('hidden');
+            medModal.classList.remove('hidden');
+        };
+
+        // --- EVENT LISTENERS ---
+        const setupEventListeners = () => {
+            document.getElementById('btn-open-modal').addEventListener('click', () => {
+                formRemedio.reset();
+                document.getElementById('tratamento-id').value = '';
+                document.getElementById('modal-title').textContent = "Novo Tratamento";
+                horariosContainer.innerHTML = '';
+                createHorarioInput();
+                medModal.classList.remove('hidden');
+            });
+            document.getElementById('btn-cancel-modal').addEventListener('click', () => medModal.classList.add('hidden'));
+            btnAddHorario.addEventListener('click', () => createHorarioInput());
+
+            formRemedio.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const id = document.getElementById('tratamento-id').value;
+                const horarios = Array.from(horariosContainer.querySelectorAll('input[type="time"]')).map(input => input.value).filter(Boolean);
+                
+                const dadosTratamento = {
+                    nome: document.getElementById('nome-remedio').value,
+                    dosagem: document.getElementById('dosagem-remedio').value,
+                    duracao: parseInt(document.getElementById('duracao-tratamento').value),
+                    instrucoes: document.getElementById('instrucoes-remedio').value,
+                    horarios: horarios,
+                };
+
+                if (id) { // Editando
+                    const index = tratamentos.findIndex(t => t.id === id);
+                    if (index > -1) {
+                        tratamentos[index] = { ...tratamentos[index], ...dadosTratamento };
+                    }
+                } else { // Novo
+                    tratamentos.push({ ...dadosTratamento, id: Date.now().toString(), dataInicio: new Date().toISOString() });
+                }
+
+                salvarTratamentos();
+                gerarDosesParaHoje();
+                renderDosesDiarias();
+                medModal.classList.add('hidden');
+            });
+
+            checklistContainer.addEventListener('click', (e) => {
+                const card = e.target.closest('.bg-white');
+                if (card) toggleConcluido(card.dataset.id);
+            });
+            
+            document.getElementById('btn-reset').addEventListener('click', () => modalConclusao.classList.add('hidden'));
+
+            // Listeners do Relatório (com delegação de eventos)
+            document.getElementById('btn-open-relatorio').addEventListener('click', () => {
+                renderRelatorio();
+                relatorioModal.classList.remove('hidden');
+});
+            document.getElementById('btn-fechar-relatorio').addEventListener('click', () => relatorioModal.classList.add('hidden'));
+            document.getElementById('btn-salvar-relatorio').addEventListener('click', () => window.print());
+
+            relatorioConteudo.addEventListener('click', (e) => {
+                const btnEdit = e.target.closest('.btn-edit');
+                const btnDelete = e.target.closest('.btn-delete');
+                if (btnEdit) {
+                    openModalForEdit(btnEdit.dataset.id);
+                }
+                if (btnDelete) {
+                    if (confirm('Tem certeza que deseja excluir este tratamento permanentemente?')) {
+                        deletarTratamento(btnDelete.dataset.id);
+                    }
+                }
+            });
+        };
+
+        init();
+    });
+    </script>
+</body>
+</html>
+
+

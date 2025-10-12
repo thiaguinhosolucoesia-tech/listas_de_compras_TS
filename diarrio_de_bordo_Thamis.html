@@ -1,0 +1,492 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diário de Bordo Kumon</title>
+    <meta name="theme-color" content="#0078C1"/>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.png">
+    <style>
+        :root {
+            --kumon-blue: #0078C1;
+            --kumon-red-accent: #DA291C;
+            --light-blue: #D6EAF8; /* Mais azul claro */
+            --text-color: #333;
+            --border-color: #A9CCE3; /* Borda mais azulada */
+            --background-color: #EBF5FB; /* Fundo mais azulado */
+            --white: #fff;
+            --success-green: #28a745;
+            --warning-orange: #ffc107;
+            --gray: #6c757d;
+            --info-purple: #6f42c1;
+            --header-bg: #CCE5FF; /* Fundo do cabeçalho levemente azul */
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--background-color); color: var(--text-color); line-height: 1.6; padding: 15px; }
+        .container { max-width: 1100px; margin: 0 auto; background-color: var(--white); padding: 20px 25px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07); }
+        header { text-align: center; margin-bottom: 25px; background-color: var(--header-bg); padding: 15px; border-radius: 8px; }
+        header h1 { color: var(--kumon-blue); font-size: 2.2em; margin-bottom: 10px; }
+        .date-navigation { display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 5px; }
+        .nav-btn { background: none; border: none; font-size: 2.2em; cursor: pointer; color: var(--kumon-blue); padding: 0 10px; transition: transform 0.2s; }
+        .nav-btn:hover:not(:disabled) { transform: scale(1.1); }
+        .nav-btn:disabled { color: var(--gray); opacity: 0.5; cursor: not-allowed; }
+        #currentDate { font-size: 1.3em; color: var(--kumon-blue); font-weight: 600; }
+        
+        /* Action Bank Styles */
+        #actionBank { margin-bottom: 20px; border: 1px solid var(--border-color); border-radius: 8px; background-color: var(--light-blue); }
+        #actionBank summary { background-color: var(--kumon-blue); color: var(--white); padding: 12px 15px; font-weight: 600; cursor: pointer; border-radius: 8px; transition: background-color 0.2s; }
+        #actionBank summary:hover { background-color: #005f9c; /* Um azul Kumon um pouco mais escuro */ }
+        #actionBank[open] summary { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+        .action-bank-content { max-height: 350px; overflow-y: auto; padding: 15px; background-color: var(--light-blue); border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
+        .action-bank-content h4 { color: var(--kumon-blue); margin-top: 15px; margin-bottom: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; font-size: 1.1em; }
+        .action-item { padding: 10px; margin: 4px 0; border-radius: 6px; cursor: pointer; transition: background-color 0.2s, color 0.2s, transform 0.1s; background-color: var(--white); border: 1px solid var(--border-color); }
+        .action-item:hover { background-color: var(--kumon-red-accent); color: var(--white); transform: translateX(5px); box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }
+        
+        .daily-wrapper { display: grid; grid-template-columns: 1fr; gap: 30px; }
+        @media (min-width: 900px) { .daily-wrapper { grid-template-columns: 1fr 1fr; } }
+        .section-box { border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; transition: all 0.3s ease; background-color: var(--white); }
+        fieldset:disabled { opacity: 0.7; background-color: #F0F8FF; /* Azul bem clarinho para campos desabilitados */ }
+        .section-box h2 { font-size: 1.6em; color: var(--kumon-blue); border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; }
+        #reviewBox { background-color: #F8F9FF; /* Levemente diferente do planningBox */ border-color: #C5D8ED; }
+        #reviewBox h2 { color: var(--info-purple); }
+        .form-section label { display: block; font-weight: 600; margin-bottom: 8px; color: #444; }
+        input[type="text"], input[type="number"], textarea { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 5px; font-size: 1em; background-color: var(--white); }
+        textarea { min-height: 100px; resize: vertical; }
+        #todo-list li { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; background-color: #F8F8F8; padding: 8px; border-radius: 4px; border: 1px solid #eee; }
+        #todo-list li span { flex-grow: 1; }
+        .button-container { text-align: center; margin-top: 25px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        button { background-color: var(--kumon-blue); color: var(--white); border: none; padding: 12px 25px; border-radius: 8px; font-size: 1.05em; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        button:disabled { background-color: var(--gray); cursor: not-allowed; transform: none; box-shadow: none; }
+        button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        button.save-btn, button#endDayBtn { background-color: var(--kumon-red-accent); }
+        button.save-btn:hover:not(:disabled), button#endDayBtn:hover:not(:disabled) { background-color: #B22222; /* Um vermelho Kumon um pouco mais escuro no hover */ }
+
+        #nextDayTips, .edit-log { display: none; margin-top: 25px; padding: 15px; background-color: #fffbeb; border-left: 5px solid var(--warning-orange); border-radius: 0 8px 8px 0; font-size: 0.9em; }
+        .edit-log { background-color: #EAF2F8; /* Azul claro para o log de edição */ border-color: var(--kumon-blue); color: var(--kumon-blue); }
+        #weeklySummarySection { display: none; margin-top: 30px; }
+        #weeklySummaryContent { white-space: pre-wrap; font-family: "SF Mono", "Courier New", monospace; line-height: 1.8; background-color: #F0F8FF; /* Fundo azul claro para o relatório */ padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.9em; overflow-x: auto; color: var(--text-color); }
+        footer { text-align: center; margin-top: 40px; color: var(--gray); font-size: 0.9em; padding: 10px; background-color: var(--header-bg); border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <header>
+            <h1>Diário de Bordo Kumon</h1>
+            <div class="date-navigation">
+                <button id="prevDayBtn" class="nav-btn">&lt;</button>
+                <p id="currentDate"></p>
+                <button id="nextDayBtn" class="nav-btn">&gt;</button>
+            </div>
+        </header>
+
+        <div id="settingsBox" class="section-box" style="margin-bottom: 20px;">
+            <div class="form-section"><label for="userName">Seu Nome (para registro de edições)</label><input type="text" id="userName" placeholder="Identifique-se para editar e finalizar dias."></div>
+        </div>
+
+        <details id="actionBank">
+            <summary>💡 Banco de Ações Estratégicas (Clique para expandir)</summary>
+            <div class="action-bank-content" id="action-bank-content">
+                <h4>📚 Pedagógico & Retenção de Alunos</h4>
+                <div class="action-item">Analisar o tempo médio de conclusão dos 5 alunos mais antigos.</div>
+                <div class="action-item">Criar um 'quadro de honra' na unidade para alunos que concluíram um estágio.</div>
+                <div class="action-item">Mapear 3 alunos em 'platô' e agendar uma mini-reunião de 5 min com cada um.</div>
+                <div class="action-item">Verificar a programação de férias de 5 alunos e antecipar orientações.</div>
+                <div class="action-item">Identificar alunos com alta taxa de erros e planejar intervenções específicas.</div>
+                <div class="action-item">Organizar um evento de 'desafio de tabuada' ou 'leitura rápida'.</div>
+                <div class="action-item">Revisar a ficha de estudos de alunos que demonstraram desmotivação recente.</div>
+                <div class="action-item">Desenvolver um roteiro para acolhimento de alunos novos na sala.</div>
+                <div class="action-item">Fazer uma demonstração prática do material Kumon para um aluno novo.</div>
+
+                <h4>📈 Captação & Marketing</h4>
+                <div class="action-item">Reativar o contato com 3 prospects antigos que não se matricularam.</div>
+                <div class="action-item">Pedir autorização para um depoimento em vídeo/texto de um pai satisfeito.</div>
+                <div class="action-item">Planejar um post para redes sociais sobre um caso de sucesso da unidade.</div>
+                <div class="action-item">Verificar se a fachada e a sinalização da unidade estão limpas e atrativas.</div>
+                <div class="action-item">Atualizar o Google Meu Negócio da unidade com novas fotos ou informações.</div>
+                <div class="action-item">Convidar um ex-aluno de sucesso para uma palestra rápida na unidade.</div>
+                <div class="action-item">Criar uma parceria com uma escola ou comércio local para divulgação.</div>
+                <div class="action-item">Desenvolver um 'Kit de Boas-Vindas' personalizado para novos alunos.</div>
+                <div class="action-item">Analisar os dados de indicações do último trimestre e identificar padrinhos.</div>
+
+                <h4>👥 Gestão da Equipe & RH</h4>
+                <div class="action-item">Realizar um treinamento rápido de 5 min sobre a 'abordagem com alunos novos'.</div>
+                <div class="action-item">Dar um feedback positivo e específico para um colaborador que se destacou.</div>
+                <div class="action-item">Revisar a escala da equipe para a próxima semana, buscando otimizações.</div>
+                <div class="action-item">Delegar a tarefa de organização do estoque de material para um assistente.</div>
+                <div class="action-item">Fazer um 'check-in' individual com cada colaborador para entender suas necessidades.</div>
+                <div class="action-item">Implementar um sistema de rotação de funções para a equipe.</div>
+                <div class="action-item">Planejar uma atividade de team building simples para o final da semana.</div>
+                <div class="action-item">Reconhecer publicamente o esforço de um membro da equipe em um momento difícil.</div>
+                <div class="action-item">Criar um mural de 'melhores práticas' na sala da equipe.</div>
+
+                <h4>👨‍👩‍👧‍👦 Comunicação com os Pais</h4>
+                <div class="action-item">Ligar para 2 pais 'apenas para dar um feedback positivo' sobre o progresso do filho.</div>
+                <div class="action-item">Enviar um comunicado sobre a importância da rotina de estudos em casa.</div>
+                <div class="action-item">Identificar 3 pais com dúvidas recorrentes e agendar uma conversa de alinhamento.</div>
+                <div class="action-item">Criar um grupo de mensagens exclusivo para comunicados importantes da unidade.</div>
+                <div class="action-item">Solicitar feedback dos pais sobre a comunicação da unidade.</div>
+                <div class="action-item">Preparar um material simples sobre 'como apoiar seu filho no Kumon'.</div>
+                <div class="action-item">Enviar um lembrete sobre o dia de pagamento/vencimento das mensalidades.</div>
+                <div class="action-item">Comunicar aos pais as datas de feriados e recesso da unidade.</div>
+
+                <h4>⚙️ Processos & Gestão da Unidade</h4>
+                <div class="action-item">Cronometrar o tempo gasto na correção de 10 blocos para identificar gargalos.</div>
+                <div class="action-item">Organizar a pasta de materiais da próxima semana.</div>
+                <div class="action-item">Revisar o fluxo de caixa do dia anterior e comparar com a meta.</div>
+                <div class="action-item">Dedicar 15 minutos para organizar a própria mesa e arquivos digitais.</div>
+                <div class="action-item">Otimizar o processo de arquivamento de fichas de estudos.</div>
+                <div class="action-item">Implementar um checklist de fechamento diário da unidade.</div>
+                <div class="action-item">Fazer um inventário rápido de materiais de escritório e pedagógicos.</div>
+                <div class="action-item">Revisar e atualizar a lista de contatos de emergência dos alunos.</div>
+                <div class="action-item">Planejar a agenda de manutenção preventiva de equipamentos.</div>
+            </div>
+        </details>
+
+        <div class="daily-wrapper">
+            <div id="planningBox" class="section-box">
+                <h2>Planejamento do Dia</h2>
+                <form id="planningForm">
+                    <fieldset id="planningFieldset">
+                        <div class="form-section"><label for="dailyFocus">Foco Principal do Dia</label><input type="text" id="dailyFocus" placeholder="Ex: Finalizar o cronograma de avaliações..."></div>
+                        <div class="form-section"><label for="criticalTasks">Tarefas Críticas (Sua atuação direta)</label><textarea id="criticalTasks" rows="3" placeholder="Ex: Ligar para mãe do aluno X..."></textarea></div>
+                        <div class="form-section"><label>A Realizar</label>
+                            <ul id="todo-list" style="list-style-type: none; padding-left: 0;"></ul>
+                            <div style="display:flex; gap: 5px; margin-top: 10px;"><input type="text" id="new-todo-input" placeholder="Nova tarefa..."><button type="button" id="add-todo-btn" style="padding: 0 15px;">+</button></div>
+                        </div>
+                        <div style="display: grid; gap: 20px; grid-template-columns: 1fr 1fr;">
+                           <div><label for="doing">Em Andamento</label><textarea id="doing"></textarea></div>
+                           <div><label for="delegated">Delegado</label><textarea id="delegated"></textarea></div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+            <div id="reviewBox" class="section-box">
+                <h2>Revisão e Fechamento do Dia</h2>
+                <form id="reviewForm">
+                     <fieldset id="reviewFieldset">
+                        <div class="form-section"><label for="mainAchievement">Principal Conquista</label><input type="text" id="mainAchievement"></div>
+                        <div class="form-section"><label for="mainChallenge">Principal Desafio/Aprendizado</label><input type="text" id="mainChallenge"></div>
+                        <div class="form-section"><label for="uncompletedTasks">O que não foi concluído e por quê?</label><textarea id="uncompletedTasks" rows="2"></textarea></div>
+                        <div class="form-section"><label>KPIs do Dia</label><div style="display: grid; gap: 15px; grid-template-columns: repeat(3, 1fr);"><div><label for="kpiMatriculas">Matrículas</label><input type="number" id="kpiMatriculas" min="0" value="0"></div><div><label for="kpiCancelamentos">Cancelamentos</label><input type="number" id="kpiCancelamentos" min="0" value="0"></div><div><label for="energyLevel">Energia (1-5)</label><input type="number" id="energyLevel" min="1" max="5"></div></div></div>
+                    </fieldset>
+                </form>
+                <div class="button-container">
+                    <button type="button" id="editDayBtn">Editar Dia</button>
+                    <button type="button" id="endDayBtn">Analisar e Finalizar Dia</button>
+                </div>
+                <div id="nextDayTips"><h3>💡 Orientador Virtual para Amanhã</h3><p id="tipContent"></p></div>
+                <div class="edit-log" id="editLog"></div>
+            </div>
+        </div>
+        <div class="button-container" style="margin-top: 40px;"><button type="button" id="showWeeklySummaryBtn">Gerar Relatório da Semana</button></div>
+        <section id="weeklySummarySection"><h2 style="text-align:center; color: var(--kumon-blue); margin-bottom: 20px;">Painel de Controle da Semana</h2><pre id="weeklySummaryContent"></pre></section>
+    </main>
+    <footer><p>Desenvolvido com 🤖, por thIAguinho Soluções</p></footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const OLD_STORAGE_KEY_V8 = 'kumonDailyLog_v8.0_Mentor';
+        const STORAGE_KEY = 'kumonDailyLog_v8.1_DeepDiveMentor';
+        const USER_SETTINGS_KEY = 'kumonDiaryUserSettings';
+
+        const App = {
+            data: {},
+            userSettings: { name: '' },
+            displayedDate: new Date(),
+            today: new Date(),
+            isEditing: false,
+
+            init() {
+                this.today.setHours(0, 0, 0, 0);
+                this.displayedDate.setHours(0, 0, 0, 0);
+                this.runMigration();
+                this.loadUserSettings();
+                this.loadData();
+                this.renderDay(this.getDateString(this.displayedDate));
+                this.addEventListeners();
+            },
+            
+            runMigration() {
+                const oldDataStr = localStorage.getItem(OLD_STORAGE_KEY_V8);
+                if (oldDataStr) {
+                    localStorage.setItem(STORAGE_KEY, oldDataStr);
+                    localStorage.removeItem(OLD_STORAGE_KEY_V8);
+                    console.log("Dados migrados para a v8.1 com sucesso.");
+                }
+            },
+
+            getDateString: date => date.toISOString().split('T')[0],
+            loadData() { this.data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; },
+            saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data)); },
+            loadUserSettings() {
+                const settings = localStorage.getItem(USER_SETTINGS_KEY);
+                if (settings) { this.userSettings = JSON.parse(settings); }
+                document.getElementById('userName').value = this.userSettings.name || '';
+            },
+            saveUserSettings() {
+                this.userSettings.name = document.getElementById('userName').value.trim();
+                localStorage.setItem(USER_SETTINGS_KEY, JSON.stringify(this.userSettings));
+            },
+            
+            renderDay(dateString) {
+                document.getElementById('currentDate').textContent = this.displayedDate.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                document.getElementById('nextDayBtn').disabled = this.getDateString(this.displayedDate) === this.getDateString(this.today);
+                document.getElementById('planningForm').reset();
+                document.getElementById('reviewForm').reset();
+                document.getElementById('todo-list').innerHTML = '';
+                document.getElementById('nextDayTips').style.display = 'none';
+                document.getElementById('editLog').style.display = 'none';
+
+                const dayData = this.data[dateString];
+                this.isEditing = false;
+                
+                if (!dayData || !dayData.review) {
+                    this.isEditing = true;
+                    document.getElementById('editDayBtn').style.display = 'none';
+                    document.getElementById('endDayBtn').style.display = 'block';
+                    document.getElementById('endDayBtn').textContent = 'Analisar e Finalizar Dia';
+                } else {
+                    document.getElementById('editDayBtn').style.display = 'block';
+                    document.getElementById('editDayBtn').textContent = 'Editar Dia';
+                    document.getElementById('endDayBtn').style.display = 'none';
+                }
+                
+                this.toggleFieldsDisabled(!this.isEditing);
+                if (!dayData) return;
+
+                const plan = dayData.plan || {};
+                document.getElementById('dailyFocus').value = plan.dailyFocus || '';
+                document.getElementById('criticalTasks').value = plan.criticalTasks || '';
+                document.getElementById('doing').value = plan.doing || '';
+                document.getElementById('delegated').value = plan.delegated || '';
+                
+                (plan.todo || []).forEach(task => this.createTodoElement(task));
+                
+                if (dayData.review) {
+                    const review = dayData.review || {};
+                    Object.keys(review).forEach(key => { const el = document.getElementById(key); if (el) el.value = review[key]; });
+                    this.generateTips(dayData);
+                }
+
+                if (dayData.log && dayData.log.length > 0) {
+                    const lastEdit = dayData.log[dayData.log.length - 1];
+                    const editDate = new Date(lastEdit.timestamp).toLocaleString('pt-BR');
+                    document.getElementById('editLog').textContent = `Última edição por ${lastEdit.user} em ${editDate}.`;
+                    document.getElementById('editLog').style.display = 'block';
+                }
+            },
+
+            toggleFieldsDisabled(isDisabled) {
+                document.getElementById('planningFieldset').disabled = isDisabled;
+                document.getElementById('reviewFieldset').disabled = isDisabled;
+            },
+
+            toggleEditMode() {
+                const dateString = this.getDateString(this.displayedDate);
+                const dayData = this.data[dateString];
+                if (!dayData || !dayData.review) return;
+
+                this.isEditing = !this.isEditing;
+                this.toggleFieldsDisabled(!this.isEditing);
+
+                const editBtn = document.getElementById('editDayBtn');
+                if (this.isEditing) {
+                    editBtn.textContent = 'Salvar Alterações';
+                    editBtn.classList.add('save-btn');
+                } else {
+                    editBtn.textContent = 'Editar Dia';
+                    editBtn.classList.remove('save-btn');
+                    this.saveCurrentState(true);
+                    this.renderDay(dateString);
+                }
+            },
+            
+            addEventListeners() {
+                document.getElementById('userName').addEventListener('change', () => this.saveUserSettings());
+                document.getElementById('endDayBtn').addEventListener('click', () => this.endDay());
+                document.getElementById('editDayBtn').addEventListener('click', () => this.toggleEditMode());
+                document.getElementById('showWeeklySummaryBtn').addEventListener('click', () => this.showWeeklySummary());
+                document.getElementById('prevDayBtn').addEventListener('click', () => this.navigateDays(-1));
+                document.getElementById('nextDayBtn').addEventListener('click', () => this.navigateDays(1));
+                document.getElementById('add-todo-btn').addEventListener('click', () => this.addTodoItem());
+                document.getElementById('new-todo-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); this.addTodoItem(); }});
+                document.getElementById('action-bank-content').addEventListener('click', (e) => {
+                    if (e.target.classList.contains('action-item')) {
+                        this.addTodoItem(e.target.textContent);
+                    }
+                });
+            },
+
+            navigateDays(direction) {
+                this.displayedDate.setDate(this.displayedDate.getDate() + direction);
+                this.renderDay(this.getDateString(this.displayedDate));
+            },
+
+            addTodoItem(predefinedText = null) {
+                const input = document.getElementById('new-todo-input');
+                const text = predefinedText || input.value.trim();
+                if (text) {
+                    this.createTodoElement({ text, deferred: false });
+                    input.value = '';
+                    this.saveCurrentState(false);
+                }
+            },
+            
+            createTodoElement(task) {
+                const li = document.createElement('li');
+                li.innerHTML = `<span>${task.text}</span> <label style="font-weight:normal; font-size: 0.9em;"><input type="checkbox" class="defer-checkbox" ${task.deferred ? 'checked' : ''}> Adiar</label>`;
+                document.getElementById('todo-list').appendChild(li);
+            },
+            
+            saveCurrentState(isEdit = false) {
+                 const dateString = this.getDateString(this.displayedDate);
+                 // Check if user name is set for critical actions
+                 if ((isEdit || document.getElementById('endDayBtn').style.display === 'block') && !this.userSettings.name) {
+                     alert("Por favor, preencha seu nome na seção 'Configurações' para registrar a edição/finalização.");
+                     document.getElementById('userName').focus();
+                     return false; // Prevent saving
+                 }
+
+                 const todoItems = Array.from(document.querySelectorAll('#todo-list li')).map(li => ({
+                    text: li.querySelector('span').textContent,
+                    deferred: li.querySelector('.defer-checkbox').checked
+                }));
+
+                const plan = { dailyFocus: document.getElementById('dailyFocus').value.trim(), criticalTasks: document.getElementById('criticalTasks').value.trim(), todo: todoItems, doing: document.getElementById('doing').value.trim(), delegated: document.getElementById('delegated').value.trim(), };
+                const review = { mainAchievement: document.getElementById('mainAchievement').value.trim(), mainChallenge: document.getElementById('mainChallenge').value.trim(), uncompletedTasks: document.getElementById('uncompletedTasks').value.trim(), energyLevel: document.getElementById('energyLevel').value, kpiMatriculas: document.getElementById('kpiMatriculas').value, kpiCancelamentos: document.getElementById('kpiCancelamentos').value, };
+                if (!this.data[dateString]) this.data[dateString] = { log: [] };
+                this.data[dateString].plan = plan;
+                if(review.mainAchievement || review.energyLevel) { this.data[dateString].review = review; }
+                if (isEdit) {
+                    this.data[dateString].log.push({ user: this.userSettings.name || 'Usuário', timestamp: new Date().toISOString() });
+                }
+                this.saveData();
+                console.log('State saved at', new Date().toLocaleTimeString());
+                return true; // Indicate successful save
+            },
+
+            endDay() {
+                if (!document.getElementById('mainAchievement').value || !document.getElementById('energyLevel').value) {
+                    alert('Por favor, preencha a Conquista do Dia e seu Nível de Energia para finalizar.'); return;
+                }
+                if (!this.saveCurrentState(true)) return; // Pass true for edit, if save fails, stop
+
+                if (confirm('Tem certeza que deseja finalizar e analisar o dia? Tarefas adiadas serão movidas para amanhã.')) {
+                    const dateString = this.getDateString(this.displayedDate);
+                    const dayData = this.data[dateString];
+                    const deferredTasks = dayData.plan.todo.filter(t => t.deferred);
+                    if (deferredTasks.length > 0) {
+                        const nextDay = new Date(this.displayedDate); nextDay.setDate(nextDay.getDate() + 1);
+                        const nextDayString = this.getDateString(nextDay);
+                        if (!this.data[nextDayString]) this.data[nextDayString] = { plan: { todo: [] }, log:[] };
+                        if (!this.data[nextDayString].plan.todo) this.data[nextDayString].plan.todo = [];
+                        deferredTasks.forEach(task => { this.data[nextDayString].plan.todo.unshift({ text: `[ADIADO] ${task.text}`, deferred: false }); });
+                    }
+                    this.saveData();
+                    this.renderDay(dateString);
+                    alert('Dia finalizado e analisado! Insights gerados e tarefas adiadas.');
+                }
+            },
+            
+            showWeeklySummary() {
+                const summarySection = document.getElementById('weeklySummarySection');
+                summarySection.style.display = 'block';
+                
+                const today = new Date(this.displayedDate); today.setHours(0, 0, 0, 0);
+                const dayOfWeek = today.getDay();
+                const offsetToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+                const firstDayOfWeek = new Date(today); firstDayOfWeek.setDate(today.getDate() + offsetToMonday);
+                const lastDayOfWeek = new Date(firstDayOfWeek); lastDayOfWeek.setDate(firstDayOfWeek.getDate() + 6);
+
+                let summaryText = `RELATÓRIO DE PERFORMANCE SEMANAL\nSemana de ${firstDayOfWeek.toLocaleDateString('pt-BR')} a ${lastDayOfWeek.toLocaleDateString('pt-BR')}\n================================================\n\n`;
+                let daysData = [];
+                for (let i = 0; i < 7; i++) {
+                    const date = new Date(firstDayOfWeek); date.setDate(date.getDate() + i);
+                    const dateString = this.getDateString(date);
+                    const dayData = this.data[dateString];
+                    if (dayData && dayData.review && dayData.review.energyLevel) {
+                        daysData.push({ date, data: dayData });
+                        const dayLabel = date.toLocaleDateString('pt-BR', {weekday: 'long', day: '2-digit', month: '2-digit'});
+                        summaryText += `--- ${dayLabel.toUpperCase()} ---\n`;
+                        summaryText += `  Foco: ${dayData.plan.dailyFocus || 'Não definido'}\n`;
+                        summaryText += `  Conquista: ${dayData.review.mainAchievement || 'Não registrada'}\n`;
+                        summaryText += `  Desafio: ${dayData.review.mainChallenge || 'Não registrado'}\n\n`;
+                    }
+                }
+
+                if(daysData.length === 0) {
+                    summaryText += "Nenhum dia foi finalizado e analisado nesta semana. Preencha seus dias para um resumo poderoso!";
+                } else {
+                    summaryText += this.generateProfessionalAnalysis(daysData);
+                }
+                
+                document.getElementById('weeklySummaryContent').textContent = summaryText;
+                summarySection.scrollIntoView({ behavior: 'smooth' });
+            },
+
+            generateProfessionalAnalysis(daysData) {
+                let analysis = "--- ANÁLISE PROFISSIONAL DA SEMANA ---\n";
+                const totalDays = daysData.length;
+                const totalMatriculas = daysData.reduce((sum, d) => sum + (parseInt(d.data.review.kpiMatriculas, 10) || 0), 0);
+                const totalCancelamentos = daysData.reduce((sum, d) => sum + (parseInt(d.data.review.kpiCancelamentos, 10) || 0), 0);
+                const avgEnergy = daysData.reduce((sum, d) => sum + (parseInt(d.data.review.energyLevel, 10) || 0), 0) / totalDays;
+
+                analysis += `  Diagnóstico de KPIs:\n`;
+                analysis += `    - Saldo de alunos: ${totalMatriculas} - ${totalCancelamentos} = ${totalMatriculas - totalCancelamentos}\n`;
+                analysis += `    - Nível médio de energia: ${avgEnergy.toFixed(1)}/5.0\n\n`;
+                analysis += `  Recomendações Estratégicas:\n`;
+                if (totalCancelamentos > totalMatriculas) {
+                    analysis += `    - ALERTA DE RETENÇÃO: O balanço de alunos foi negativo. A prioridade para a próxima semana deve ser a fidelização. Sugestão: Inicie a semana mapeando os alunos em platô ou desmotivados e crie um plano de ação para reconectá-los.\n`;
+                } else if (totalMatriculas > totalCancelamentos) {
+                    analysis += `    - MOMENTUM DE CAPTAÇÃO: O balanço de alunos foi positivo. Excelente! Analise a origem dessas novas matrículas (indicação, fachada, redes sociais?) e intensifique os esforços nesse canal específico.\n`;
+                } else {
+                     analysis += `    - ESTABILIDADE: A unidade manteve o número de alunos. É um bom momento para focar na qualidade dos processos internos e no desenvolvimento da equipe, preparando o terreno para o próximo ciclo de crescimento.\n`;
+                }
+
+                if (avgEnergy < 2.5) {
+                    analysis += `    - GESTÃO DE ENERGIA: Seu nível de energia esteve consistentemente baixo. Isso é um risco para a sustentabilidade da gestão. Para a próxima semana, identifique UMA tarefa operacional que possa ser delegada ou automatizada. Proteger sua energia é uma atividade estratégica.\n`;
+                } else if (avgEnergy >= 4.0) {
+                    analysis += `    - ENERGIA EM ALTA: Seu nível de energia foi elevado! Como você pode replicar as condições que levaram a isso? Compartilhe essa energia com a equipe para impulsionar a produtividade geral.\n`;
+                }
+                
+                return analysis;
+            },
+            
+            generateTips(dayData) {
+                let tips = [];
+                const { plan, review } = dayData;
+                if (plan.dailyFocus && review.mainAchievement && !review.mainAchievement.toLowerCase().includes(plan.dailyFocus.toLowerCase().slice(0, 10))) {
+                    tips.push("INSIGHT DE FOCO: Sua principal conquista pareceu diferente do foco que você definiu. Isso pode indicar que urgências desviaram sua energia. Avalie se o foco de amanhã precisa ser mais protegido e se o planejamento foi realista.");
+                }
+                if (review.uncompletedTasks) {
+                    tips.push(`PENDÊNCIAS: Você mencionou tarefas não concluídas: "${review.uncompletedTasks}". Avalie se alguma delas deve ser a **primeira prioridade** de amanhã para evitar o efeito "bola de neve" ou se podem ser delegadas.`);
+                }
+                if (review.energyLevel <= 2) {
+                    tips.push(`ENERGIA: Seu nível de energia foi baixo hoje. A consistência vence a intensidade. Garanta uma pausa revigorante de 10 minutos amanhã, longe das telas. Sua unidade precisa de você no seu melhor.`);
+                } else if (review.energyLevel >= 4) {
+                    tips.push(`ALAVANCAGEM DA ENERGIA: Seu nível de energia esteve alto! Qual foi o fator principal? Pense em como replicar essa condição e como usar essa energia positiva para motivar a equipe amanhã. Celebre as pequenas vitórias!`);
+                }
+                if (review.mainAchievement) {
+                    tips.push(`IMPACTO: Sua principal conquista foi "${review.mainAchievement}". Como você pode comunicar este sucesso (para pais, equipe, rede) para gerar um impacto ainda maior amanhã?`);
+                }
+                const tipsContainer = document.getElementById('nextDayTips');
+                document.getElementById('tipContent').textContent = tips.length > 0 ? tips.join('\n\n') : 'Dia produtivo! Mantenha o foco e a consistência. Ótimo trabalho!';
+                tipsContainer.style.display = 'block';
+            },
+        };
+
+        App.init();
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => { console.log('Service Worker registrado com sucesso:', registration.scope); })
+                    .catch(error => { console.log('Falha no registro do Service Worker:', error); });
+            });
+        }
+    });
+    </script>
+</body>
+</html>
+
