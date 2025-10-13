@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Enfermeiro Inteligente - Controle de Medicamentos</title>
+    <title>Meu Enfermeiro Inteligente - Controle Multiusuário</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,119 +12,132 @@
     
     <style>
         body { 
-            font-family: 'Poppins', sans-serif; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Poppins', sans-serif;
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            -webkit-tap-highlight-color: transparent; 
-        }
+            -webkit-tap-highlight-color: transparent;
+}
         
         .dark-mode {
             background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-        }
+}
         
         .btn-principal, .btn-secundario, .btn-icon { 
-            transition: all 0.2s ease-in-out; 
-        }
+            transition: all 0.2s ease-in-out;
+}
         
         .btn-principal:active, .btn-secundario:active, .btn-icon:active { 
-            transform: scale(0.95); 
-            filter: brightness(0.9); 
+            transform: scale(0.95);
+filter: brightness(0.9); 
         }
         
         .fade-in-scale { 
-            animation: fadeInScale 0.4s ease-out forwards; 
-        }
+            animation: fadeInScale 0.4s ease-out forwards;
+}
         
         @keyframes fadeInScale { 
-            from { opacity: 0; transform: scale(0.95); } 
-            to { opacity: 1; transform: scale(1); } 
+            from { opacity: 0;
+transform: scale(0.95); } 
+            to { opacity: 1;
+transform: scale(1); } 
         }
         
         .card-concluido { 
-            background-color: #e8f5e9; 
-            border-left-color: #4caf50; 
+            background-color: #e8f5e9;
+border-left-color: #4caf50; 
             opacity: 0.8; 
         }
         
         .card-concluido .info-remedio { 
-            text-decoration: line-through; 
-            color: #555; 
+            text-decoration: line-through;
+color: #555; 
         }
         
         .card-atrasado {
             border-left-color: #f44336;
-            background-color: #ffebee;
+background-color: #ffebee;
         }
         
         .card-proximo {
             border-left-color: #ff9800;
-            background-color: #fff3e0;
+background-color: #fff3e0;
             animation: pulse 2s infinite;
         }
         
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
+            0%, 100% { opacity: 1;
+}
+            50% { opacity: 0.8;
+}
         }
         
         .toast {
             position: fixed;
-            top: 20px;
+top: 20px;
             right: 20px;
             padding: 16px 24px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             z-index: 1000;
             animation: slideInRight 0.3s ease-out;
-        }
+}
         
         @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from { transform: translateX(100%);
+opacity: 0; }
+            to { transform: translateX(0); opacity: 1;
+}
         }
         
-        .toast-success { background-color: #4caf50; color: white; }
-        .toast-error { background-color: #f44336; color: white; }
-        .toast-info { background-color: #2196f3; color: white; }
+        .toast-success { background-color: #4caf50;
+color: white; }
+        .toast-error { background-color: #f44336; color: white;
+}
+        .toast-info { background-color: #2196f3; color: white;
+}
         
         .input-error {
             border-color: #f44336 !important;
-            background-color: #ffebee !important;
+background-color: #ffebee !important;
         }
         
         .error-message {
             color: #f44336;
-            font-size: 0.875rem;
+font-size: 0.875rem;
             margin-top: 0.25rem;
         }
         
         @media print {
-            body * { visibility: hidden; }
-            #relatorio-imprimir, #relatorio-imprimir * { visibility: visible; }
-            #relatorio-imprimir { position: absolute; left: 0; top: 0; width: 100%; }
-            .no-print { display: none; }
+            body * { visibility: hidden;
+}
+            #relatorio-imprimir, #relatorio-imprimir * { visibility: visible;
+}
+            #relatorio-imprimir { position: absolute; left: 0; top: 0;
+width: 100%; }
+            .no-print { display: none;
+}
         }
         
         .dark-mode .bg-white {
             background-color: #2d3748 !important;
-            color: #e2e8f0;
+color: #e2e8f0;
         }
         
         .dark-mode .text-gray-900 {
             color: #e2e8f0 !important;
-        }
+}
         
         .dark-mode .text-gray-600 {
             color: #cbd5e0 !important;
-        }
+}
         
         .dark-mode .border-gray-300 {
             border-color: #4a5568 !important;
-        }
+}
         
         .notification-badge {
             position: absolute;
-            top: -8px;
+top: -8px;
             right: -8px;
             background-color: #f44336;
             color: white;
@@ -134,7 +147,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.75rem;
+font-size: 0.75rem;
             font-weight: bold;
         }
     </style>
@@ -146,261 +159,340 @@
         <header class="text-center mb-8 bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
             <div class="flex justify-between items-center mb-4">
                 <div class="flex items-center gap-2">
-                    <span class="text-4xl">馃拪</span>
-                    <h1 class="text-3xl sm:text-4xl font-bold text-blue-800">Meu Enfermeiro Inteligente</h1>
+                    <span class="text-4xl">💊</span>
+           
+         <h1 class="text-3xl sm:text-4xl font-bold text-blue-800">Meu Enfermeiro Inteligente</h1>
                 </div>
                 <div class="flex gap-2">
                     <button id="btn-toggle-dark" class="btn-icon p-3 bg-gray-200 rounded-full hover:bg-gray-300 transition" title="Alternar modo escuro">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                     
+   <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                         </svg>
-                    </button>
-                    <button id="btn-notifications" class="btn-icon p-3 bg-gray-200 rounded-full hover:bg-gray-300 transition relative" title="Configurar notifica莽玫es">
+                  
+  </button>
+                    <button id="btn-notifications" class="btn-icon p-3 bg-gray-200 rounded-full hover:bg-gray-300 transition relative" title="Configurar notificações">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 
+0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                         </svg>
                         <span id="notification-badge" class="notification-badge hidden">0</span>
                     </button>
-                </div>
+    
             </div>
-            <p class="text-gray-600 text-lg mt-1">Hoje 茅 <span id="current-date" class="font-semibold"></span></p>
-            <p class="text-gray-500 text-sm mt-2">Seu assistente pessoal para nunca esquecer seus medicamentos</p>
+            </div>
+            
+            <div class="mt-4 p-4 bg-blue-50 rounded-lg flex flex-col sm:flex-row items-center gap-4">
+                <label for="user-selector" class="text-lg font-semibold text-blue-800">Paciente:</label>
+                <select id="user-selector" class="flex-grow mt-1 w-full sm:w-auto px-4 py-3 border border-gray-300 rounded-lg text-lg bg-white focus:ring-2 focus:ring-blue-500 transition"></select>
+                <button id="btn-manage-users" class="btn-secundario bg-white text-blue-600 border-2 border-blue-500 font-bold py-2 px-4 rounded-full shadow-sm text-md hover:bg-blue-50 transition">
+                    Gerenciar
+                </button>
+            </div>
+
+            <p class="text-gray-600 text-lg mt-4">Hoje é <span id="current-date" class="font-semibold"></span></p>
         </header>
 
-        <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mb-10">
-            <button id="btn-open-modal" class="btn-principal bg-blue-600 text-white font-bold py-4 px-8 rounded-full shadow-lg text-xl flex items-center gap-3 w-full sm:w-auto hover:bg-blue-700 transition">
+        <div id="main-controls" class="flex flex-col sm:flex-row justify-center items-center gap-4 mb-10">
+            
+<button id="btn-open-modal" class="btn-principal bg-blue-600 text-white font-bold py-4 px-8 rounded-full shadow-lg text-xl flex items-center gap-3 w-full sm:w-auto hover:bg-blue-700 transition">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" /></svg>
                 Adicionar Tratamento
             </button>
-            <button id="btn-open-relatorio" class="btn-secundario bg-white text-blue-600 border-2 border-blue-500 font-bold py-3 px-6 rounded-full shadow-sm text-lg flex items-center gap-3 w-full sm:w-auto hover:bg-blue-50 transition">
+  
+          <button id="btn-open-relatorio" class="btn-secundario bg-white text-blue-600 border-2 border-blue-500 font-bold py-3 px-6 rounded-full shadow-sm text-lg flex items-center gap-3 w-full sm:w-auto hover:bg-blue-50 transition">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                Ver Relat贸rio
-            </button>
+                Ver Relatório
+   
+         </button>
         </div>
 
         <main id="checklist-container" class="space-y-10"></main>
         
         <div id="placeholder" class="text-center bg-white/90 backdrop-blur-sm p-10 rounded-2xl shadow-xl mt-10">
-            <div class="text-6xl mb-4">馃拪</div>
-            <p class="mt-4 text-xl text-gray-600 font-semibold">Nenhum tratamento ativo para hoje.</p>
-            <p class="text-gray-500 mt-2">Clique no bot茫o "Adicionar Tratamento" acima para come莽ar!</p>
-            <p class="text-gray-400 mt-4 text-sm">Seu enfermeiro inteligente est谩 pronto para ajud谩-lo a gerenciar seus medicamentos.</p>
+            <div id="placeholder-icon" class="text-6xl mb-4">👥</div>
+            <p id="placeholder-title" class="mt-4 text-xl text-gray-600 font-semibold">Selecione ou crie um perfil de paciente para começar.</p>
+            <p id="placeholder-subtitle" class="text-gray-500 mt-2">Use o menu "Paciente" acima para gerenciar os perfis.</p>
         </div>
         
-        <footer class="mt-12 bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
+        <footer id="footer-progress" class="mt-12 bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
             <h3 class="text-xl font-semibold mb-3 text-center">Progresso do Dia</h3>
             <div class="w-full bg-gray-200 rounded-full h-6 shadow-inner overflow-hidden">
-                <div id="progress-bar" class="bg-gradient-to-r from-green-400 to-green-600 h-6 rounded-full transition-all duration-500 flex items-center justify-center text-white font-bold text-sm" style="width: 0%"></div>
+   
+             <div id="progress-bar" class="bg-gradient-to-r from-green-400 to-green-600 h-6 rounded-full transition-all duration-500 flex items-center justify-center text-white font-bold text-sm" style="width: 0%"></div>
             </div>
             <p id="progress-text" class="text-lg text-gray-600 mt-3 text-center"></p>
             <div id="next-dose-info" class="mt-4 p-4 bg-blue-50 rounded-lg text-center hidden">
-                <p class="text-sm text-gray-600">Pr贸xima dose:</p>
-                <p class="text-lg font-bold text-blue-700" id="next-dose-text"></p>
+                <p class="text-sm text-gray-600">Próxima dose:</p>
+    
+            <p class="text-lg font-bold text-blue-700" id="next-dose-text"></p>
             </div>
         </footer>
 
         <div class="mt-8 text-center text-white/80 text-sm">
-            <p>Desenvolvido com IA por thIAguinho Solu莽玫es</p>
+            <p>Desenvolvido com IA por thIAguinho Soluções</p>
         </div>
 
     </div>
 
-    <!-- Modal para Adicionar/Editar Tratamento -->
-    <div id="med-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50 backdrop-blur-sm">
+    <div id="med-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 
+hidden z-50 backdrop-blur-sm">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all max-h-[90vh] overflow-y-auto" id="modal-content">
             <form id="form-remedio" class="p-6 sm:p-8 space-y-5">
                 <input type="hidden" id="tratamento-id">
                 
                 <div class="flex justify-between items-center mb-4">
-                    <h2 id="modal-title" class="text-2xl font-bold">Novo Tratamento</h2>
+          
+          <h2 id="modal-title" class="text-2xl font-bold">Novo Tratamento</h2>
                     <button type="button" id="btn-close-modal-x" class="text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
                 </div>
                 
                 <div>
-                    <label for="nome-remedio" class="block text-lg font-medium mb-1">Nome do Rem茅dio *</label>
+            
+        <label for="nome-remedio" class="block text-lg font-medium mb-1">Nome do Remédio *</label>
                     <input type="text" id="nome-remedio" placeholder="Ex: Azitromicina" required class="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
                     <p class="error-message hidden" id="error-nome-remedio"></p>
                 </div>
-                
+        
+        
                 <div>
                     <label for="dosagem-remedio" class="block text-lg font-medium mb-1">Dose *</label>
                     <input type="text" id="dosagem-remedio" placeholder="Ex: 1 comprimido de 500mg" required class="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
-                    <p class="error-message hidden" id="error-dosagem-remedio"></p>
+          
+          <p class="error-message hidden" id="error-dosagem-remedio"></p>
                 </div>
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label for="tipo-tratamento" class="block text-lg font-medium mb-1">Tipo de Tratamento *</label>
+               
+         <label for="tipo-tratamento" class="block text-lg font-medium mb-1">Tipo de Tratamento *</label>
                         <select id="tipo-tratamento" required class="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg text-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
-                            <option value="temporario">Tempor谩rio (por X dias)</option>
-                            <option value="continuo">Cont铆nuo (sem data fim)</option>
+                            <option value="temporario">Temporário (por X dias)</option>
+            
+                <option value="continuo">Contínuo (sem data fim)</option>
                         </select>
                     </div>
                     
-                    <div id="duracao-container">
-                        <label for="duracao-tratamento" class="block text-lg font-medium mb-1">Dura莽茫o (dias) *</label>
+                
+    <div id="duracao-container">
+                        <label for="duracao-tratamento" class="block text-lg font-medium mb-1">Duração (dias) *</label>
                         <input type="number" id="duracao-tratamento" placeholder="Ex: 5" min="1" required class="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
-                        <p class="error-message hidden" id="error-duracao-tratamento"></p>
+                      
+  <p class="error-message hidden" id="error-duracao-tratamento"></p>
                     </div>
                 </div>
                 
                 <div>
-                    <label class="block text-lg font-medium mb-2">Hor谩rios *</label>
-                    
+                    <label class="block text-lg font-medium mb-2">Horários *</label>
+  
+                  
                     <div class="mb-3 p-4 bg-blue-50 rounded-lg">
-                        <p class="text-sm text-gray-700 mb-2 font-medium">Sugest玫es r谩pidas:</p>
+                        <p class="text-sm text-gray-700 mb-2 font-medium">Sugestões rápidas:</p>
                         <div class="flex flex-wrap gap-2">
-                            <button type="button" class="btn-sugestao px-3 py-1 bg-white border border-blue-300 rounded-full text-sm hover:bg-blue-100 transition" data-intervalo="24">1x ao dia</button>
+  
+                          <button type="button" class="btn-sugestao px-3 py-1 bg-white border border-blue-300 rounded-full text-sm hover:bg-blue-100 transition" data-intervalo="24">1x ao dia</button>
                             <button type="button" class="btn-sugestao px-3 py-1 bg-white border border-blue-300 rounded-full text-sm hover:bg-blue-100 transition" data-intervalo="12">A cada 12h</button>
-                            <button type="button" class="btn-sugestao px-3 py-1 bg-white border border-blue-300 rounded-full text-sm hover:bg-blue-100 transition" data-intervalo="8">A cada 8h</button>
+                  
+          <button type="button" class="btn-sugestao px-3 py-1 bg-white border border-blue-300 rounded-full text-sm hover:bg-blue-100 transition" data-intervalo="8">A cada 8h</button>
                             <button type="button" class="btn-sugestao px-3 py-1 bg-white border border-blue-300 rounded-full text-sm hover:bg-blue-100 transition" data-intervalo="6">A cada 6h</button>
-                            <button type="button" class="btn-sugestao px-3 py-1 bg-white border border-blue-300 rounded-full text-sm hover:bg-blue-100 transition" data-intervalo="4">A cada 4h</button>
+                            <button type="button" class="btn-sugestao px-3 py-1 bg-white 
+border border-blue-300 rounded-full text-sm hover:bg-blue-100 transition" data-intervalo="4">A cada 4h</button>
                         </div>
                     </div>
                     
                     <div id="horarios-container" class="space-y-2"></div>
-                    <button type="button" id="btn-add-horario" class="mt-2 w-full text-blue-600 font-semibold border-2 border-dashed border-blue-400 rounded-lg py-2 hover:bg-blue-50 transition">+ Adicionar hor谩rio manualmente</button>
+      
+              <button type="button" id="btn-add-horario" class="mt-2 w-full text-blue-600 font-semibold border-2 border-dashed border-blue-400 rounded-lg py-2 hover:bg-blue-50 transition">+ Adicionar horário manualmente</button>
                     <p class="error-message hidden" id="error-horarios"></p>
                 </div>
                 
-                <div>
-                    <label for="instrucoes-remedio" class="block text-lg font-medium mb-1">Como tomar? *</label>
+               
+ <div>
+                    <label for="instrucoes-remedio" class="block text-lg font-medium mb-1">Como tomar?
+*</label>
                     <select id="instrucoes-remedio" required class="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg text-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
-                        <option value="Depois de comer">Depois de comer 馃嵆</option>
-                        <option value="Antes de comer (jejum)">Antes de comer (jejum) 馃晵</option>
-                        <option value="Com bastante 谩gua">Com bastante 谩gua 馃挧</option>
-                        <option value="Com alimentos">Com alimentos 馃嵔锔�</option>
-                        <option value="Sublingual">Sublingual 馃憛</option>
-                        <option value="Uso t贸pico">Uso t贸pico 馃Т</option>
-                        <option value="N茫o importa">N茫o importa 馃憤</option>
-                        <option value="personalizado">Personalizado 鉁忥笍</option>
+                        <option value="Depois de comer">Depois de comer 🍳</option>
+                        <option value="Antes de comer (jejum)">Antes de comer (jejum) 🕒</option>
+   
+                     <option value="Com bastante água">Com bastante água 💧</option>
+                        <option value="Com alimentos">Com alimentos 🍽️</option>
+                        <option value="Sublingual">Sublingual 👅</option>
+                   
+     <option value="Uso tópico">Uso tópico 🧴</option>
+                        <option value="Não importa">Não importa 👍</option>
+                        <option value="personalizado">Personalizado ✏️</option>
                     </select>
                 </div>
-                
+ 
+               
                 <div id="instrucoes-personalizadas-container" class="hidden">
-                    <label for="instrucoes-personalizadas" class="block text-lg font-medium mb-1">Instru莽玫es Personalizadas</label>
-                    <textarea id="instrucoes-personalizadas" placeholder="Digite instru莽玫es espec铆ficas..." class="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" rows="3"></textarea>
-                </div>
+                    <label for="instrucoes-personalizadas" class="block text-lg font-medium mb-1">Instruções Personalizadas</label>
+                    <textarea id="instrucoes-personalizadas" placeholder="Digite instruções específicas..." class="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" rows="3"></textarea>
+    
+            </div>
                 
                 <div class="flex justify-end gap-4 pt-4 border-t">
                     <button type="button" id="btn-cancel-modal" class="px-8 py-3 bg-gray-200 rounded-lg text-lg hover:bg-gray-300 transition">Cancelar</button>
-                    <button type="submit" class="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg text-lg hover:bg-blue-700 transition">Salvar Tratamento</button>
+                    <button type="submit" 
+class="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg text-lg hover:bg-blue-700 transition">Salvar Tratamento</button>
                 </div>
             </form>
         </div>
     </div>
-
-    <!-- Modal de Relat贸rio -->
-    <div id="relatorio-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl transform transition-all flex flex-col" style="max-height: 90vh;">
-            <div id="relatorio-imprimir" class="p-6 sm:p-8">
-                <div class="flex justify-between items-center mb-4">
-                    <div>
-                        <h2 class="text-2xl font-bold">Relat贸rio de Tratamento</h2>
-                        <p class="text-gray-500 mt-1">Progresso geral at茅 <span id="relatorio-data"></span></p>
-                    </div>
-                    <button type="button" id="btn-close-relatorio-x" class="text-gray-400 hover:text-gray-600 text-3xl leading-none no-print">&times;</button>
-                </div>
-                
-                <div class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
-                    <div class="grid grid-cols-3 gap-4 text-center">
-                        <div>
-                            <p class="text-2xl font-bold text-blue-600" id="stats-total">0</p>
-                            <p class="text-sm text-gray-600">Total de Tratamentos</p>
-                        </div>
-                        <div>
-                            <p class="text-2xl font-bold text-green-600" id="stats-ativos">0</p>
-                            <p class="text-sm text-gray-600">Ativos</p>
-                        </div>
-                        <div>
-                            <p class="text-2xl font-bold text-purple-600" id="stats-concluidos">0</p>
-                            <p class="text-sm text-gray-600">Conclu铆dos</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="relatorio-conteudo" class="space-y-4 overflow-y-auto" style="max-height: 50vh;"></div>
+    
+    <div id="user-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 sm:p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">Gerenciar Pacientes</h3>
+                <button type="button" id="btn-close-user-modal-x" class="text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
             </div>
-            <div class="flex justify-between gap-4 p-4 bg-gray-50 border-t rounded-b-2xl no-print">
-                <button type="button" id="btn-exportar-csv" class="px-6 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition">Exportar CSV</button>
-                <div class="flex gap-2">
-                    <button type="button" id="btn-fechar-relatorio" class="px-6 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition">Fechar</button>
-                    <button type="button" id="btn-salvar-relatorio" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">Imprimir</button>
+            
+            <form id="form-add-user" class="flex items-center gap-2 mb-6">
+                <input type="text" id="new-user-name" placeholder="Nome do novo paciente" required class="flex-grow px-4 py-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500">
+                <button type="submit" class="p-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" /></svg>
+                </button>
+            </form>
+
+            <div id="user-list-container" class="space-y-2 max-h-60 overflow-y-auto">
                 </div>
+            
+            <div class="mt-6 flex justify-end">
+                <button type="button" id="btn-close-user-modal" class="px-6 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition">Fechar</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal de Conclus茫o do Dia -->
+
+    <div id="relatorio-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl transform transition-all flex flex-col" style="max-height: 90vh;">
+        
+    <div id="relatorio-imprimir" class="p-6 sm:p-8">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h2 class="text-2xl font-bold">Relatório de Tratamento</h2>
+                        <p 
+class="text-gray-500 mt-1">Progresso geral até <span id="relatorio-data"></span></p>
+                    </div>
+                    <button type="button" id="btn-close-relatorio-x" class="text-gray-400 hover:text-gray-600 text-3xl leading-none no-print">&times;</button>
+                </div>
+                
+                
+<div class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+                    <div class="grid grid-cols-3 gap-4 text-center">
+                        <div>
+                            <p class="text-2xl font-bold text-blue-600" id="stats-total">0</p>
+              
+              <p class="text-sm text-gray-600">Total de Tratamentos</p>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-bold text-green-600" id="stats-ativos">0</p>
+  
+                          <p class="text-sm text-gray-600">Ativos</p>
+                        </div>
+                        <div>
+                        
+    <p class="text-2xl font-bold text-purple-600" id="stats-concluidos">0</p>
+                            <p class="text-sm text-gray-600">Concluídos</p>
+                        </div>
+                    </div>
+                </div>
+  
+              
+                <div id="relatorio-conteudo" class="space-y-4 overflow-y-auto" style="max-height: 50vh;"></div>
+            </div>
+            <div class="flex justify-between gap-4 p-4 bg-gray-50 border-t rounded-b-2xl no-print">
+                <button type="button" id="btn-exportar-csv" class="px-6 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition">Exportar CSV</button>
+      
+          <div class="flex gap-2">
+                    <button type="button" id="btn-fechar-relatorio" class="px-6 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition">Fechar</button>
+                    <button type="button" id="btn-salvar-relatorio" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">Imprimir</button>
+                </div>
+            </div>
+  
+      </div>
+    </div>
+
     <div id="modal-conclusao" class="fixed inset-0 bg-gradient-to-br from-green-500 to-green-700 bg-opacity-95 flex items-center justify-center p-4 hidden z-50 backdrop-blur-sm">
          <div class="text-center text-white">
-            <div class="text-9xl animate-bounce mb-6">馃帀</div>
-            <h2 class="text-4xl sm:text-5xl font-bold mt-4">Parab茅ns!</h2>
-            <p class="text-xl sm:text-2xl mt-4 max-w-lg">Voc锚 tomou todos os medicamentos de hoje! Continue assim! 馃憦</p>
+            <div class="text-9xl animate-bounce mb-6">🎉</div>
+            <h2 class="text-4xl sm:text-5xl font-bold mt-4">Parabéns!</h2>
+            <p class="text-xl sm:text-2xl mt-4 max-w-lg">Você tomou todos os 
+medicamentos de hoje! Continue assim! 👏</p>
             <div class="mt-8 p-6 bg-white/20 rounded-2xl backdrop-blur-sm">
-                <p class="text-lg">Seu compromisso com a sa煤de 茅 inspirador!</p>
+                <p class="text-lg">Seu compromisso com a saúde é inspirador!</p>
             </div>
             <button id="btn-reset" class="btn-principal mt-10 bg-white text-green-600 font-bold py-4 px-8 rounded-full shadow-lg text-xl hover:bg-gray-100 transition">Entendido</button>
         </div>
     </div>
 
-    <!-- Modal de Confirma莽茫o de Exclus茫o -->
     <div id="modal-confirmar-exclusao" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50 backdrop-blur-sm">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 sm:p-8">
             <div class="text-center">
-                <div class="text-6xl mb-4">鈿狅笍</div>
-                <h3 class="text-2xl font-bold mb-2">Confirmar Exclus茫o</h3>
-                <p class="text-gray-600 mb-6">Tem certeza que deseja excluir este tratamento? Esta a莽茫o n茫o pode ser desfeita.</p>
+                <div class="text-6xl mb-4">⚠️</div>
+                <h3 class="text-2xl font-bold mb-2">Confirmar Exclusão</h3>
+              
+  <p class="text-gray-600 mb-6">Tem certeza que deseja excluir este tratamento?
+Esta ação não pode ser desfeita.</p>
                 <div class="flex gap-4 justify-center">
                     <button type="button" id="btn-cancelar-exclusao" class="px-6 py-3 bg-gray-200 rounded-lg hover:bg-gray-300 transition">Cancelar</button>
                     <button type="button" id="btn-confirmar-exclusao" class="px-6 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition">Sim, Excluir</button>
                 </div>
-            </div>
+ 
+           </div>
         </div>
     </div>
 
-    <!-- Modal de Configura莽茫o de Notifica莽玫es -->
     <div id="modal-notificacoes" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50 backdrop-blur-sm">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 sm:p-8">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-2xl font-bold">Configura莽玫es de Notifica莽玫es</h3>
+                <h3 class="text-2xl font-bold">Configurações de 
+Notificações</h3>
                 <button type="button" id="btn-close-notificacoes-x" class="text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
             </div>
             
             <div class="space-y-4">
                 <div class="p-4 bg-blue-50 rounded-lg">
-                    <p class="text-sm text-gray-700">As notifica莽玫es ajudam voc锚 a lembrar de tomar seus medicamentos nos hor谩rios corretos.</p>
+                    <p class="text-sm 
+text-gray-700">As notificações ajudam você a lembrar de tomar seus medicamentos nos horários corretos.</p>
                 </div>
                 
                 <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                     <div>
-                        <p class="font-semibold">Ativar Notifica莽玫es</p>
+              
+          <p class="font-semibold">Ativar Notificações</p>
                         <p class="text-sm text-gray-600">Receber lembretes no navegador</p>
                     </div>
                     <button id="btn-toggle-notificacoes" class="w-14 h-8 bg-gray-300 rounded-full relative transition" data-enabled="false">
-                        <span class="absolute left-1 top-1 w-6 h-6 bg-white rounded-full transition-transform"></span>
+           
+             <span class="absolute left-1 top-1 w-6 h-6 bg-white rounded-full transition-transform"></span>
                     </button>
                 </div>
                 
                 <div id="notificacao-status" class="p-4 rounded-lg hidden">
-                    <p class="text-sm"></p>
+       
+             <p class="text-sm"></p>
                 </div>
                 
                 <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                     <div>
-                        <p class="font-semibold">Lembrete Antecipado</p>
-                        <p class="text-sm text-gray-600">Minutos antes do hor谩rio</p>
+            
+            <p class="font-semibold">Lembrete Antecipado</p>
+                        <p class="text-sm text-gray-600">Minutos antes do horário</p>
                     </div>
                     <select id="select-antecedencia" class="px-3 py-2 border border-gray-300 rounded-lg bg-white">
-                        <option value="0">No hor谩rio</option>
+          
+              <option value="0">No horário</option>
                         <option value="5">5 minutos antes</option>
                         <option value="10" selected>10 minutos antes</option>
                         <option value="15">15 minutos antes</option>
-                        <option value="30">30 minutos antes</option>
+  
+                      <option value="30">30 minutos antes</option>
                     </select>
                 </div>
                 
-                <button type="button" id="btn-testar-notificacao" class="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">Testar Notifica莽茫o</button>
+                <button type="button" id="btn-testar-notificacao" class="w-full px-6 py-3 bg-blue-600 
+text-white font-semibold rounded-lg hover:bg-blue-700 transition">Testar Notificação</button>
             </div>
             
             <div class="mt-6 flex justify-end">
@@ -409,116 +501,140 @@
         </div>
     </div>
     
-    <script>
+    
+<script>
     // ========================================
-    // M脫DULO DE GERENCIAMENTO DE DADOS
+    // MÓDULO DE GERENCIAMENTO DE DADOS (MULTI-USUÁRIO)
     // ========================================
     const DataManager = {
-        // Chaves de armazenamento
-        KEYS: {
-            TRATAMENTOS: 'tratamentos_v7',
-            DOSES: 'dosesDiarias_v7',
-            ULTIMA_GERACAO: 'ultimaGeracao_v7',
-            DARK_MODE: 'darkMode_v7',
-            NOTIFICACOES: 'notificacoesAtivadas_v7',
-            ANTECEDENCIA: 'antecedenciaNotificacao_v7'
+        // Chaves base de armazenamento
+        BASE_KEYS: {
+            TRATAMENTOS: 'tratamentos_v8',
+            DOSES: 'dosesDiarias_v8',
+            ULTIMA_GERACAO: 'ultimaGeracao_v8',
+            NOTIFICACOES: 'notificacoesAtivadas_v8',
+            ANTECEDENCIA: 'antecedenciaNotificacao_v8'
+        },
+        // Chaves globais (não dependem do usuário)
+        GLOBAL_KEYS: {
+            USERS: 'smartnurse_users_v8',
+            ACTIVE_USER: 'smartnurse_activeUser_v8',
+            DARK_MODE: 'smartnurse_darkMode_v8',
+        },
+
+        // --- Gerenciamento de Usuários ---
+        getUsers() {
+            return JSON.parse(localStorage.getItem(this.GLOBAL_KEYS.USERS)) || [];
+        },
+        saveUsers(users) {
+            localStorage.setItem(this.GLOBAL_KEYS.USERS, JSON.stringify(users));
+        },
+        getActiveUserId() {
+            return localStorage.getItem(this.GLOBAL_KEYS.ACTIVE_USER);
+        },
+        setActiveUserId(userId) {
+            localStorage.setItem(this.GLOBAL_KEYS.ACTIVE_USER, userId);
         },
         
-        // Carregar tratamentos
+        // Helper para criar a chave de armazenamento específica do usuário
+        _getUserKey(baseKey) {
+            const activeUserId = this.getActiveUserId();
+            if (!activeUserId) return null; // Retorna nulo se nenhum usuário estiver ativo
+            return `user_${activeUserId}_${baseKey}`;
+        },
+
+        // --- Métodos de Dados por Usuário ---
+        _getData(baseKey) {
+            const userKey = this._getUserKey(baseKey);
+            if (!userKey) return null;
+            try {
+                return JSON.parse(localStorage.getItem(userKey));
+            } catch (error) {
+                console.error(`Erro ao carregar dados para a chave ${userKey}:`, error);
+                return null;
+            }
+        },
+        _saveData(baseKey, data) {
+            const userKey = this._getUserKey(baseKey);
+            if (!userKey) {
+                console.error('Não é possível salvar dados sem um usuário ativo.');
+                return false;
+            }
+            try {
+                localStorage.setItem(userKey, JSON.stringify(data));
+                return true;
+            } catch (error) {
+                console.error(`Erro ao salvar dados para a chave ${userKey}:`, error);
+                UI.mostrarToast('Erro ao salvar dados', 'error');
+                return false;
+            }
+        },
+        
+        // Carregar tratamentos do usuário ativo
         carregarTratamentos() {
-            try {
-                return JSON.parse(localStorage.getItem(this.KEYS.TRATAMENTOS)) || [];
-            } catch (error) {
-                console.error('Erro ao carregar tratamentos:', error);
-                return [];
-            }
+            return this._getData(this.BASE_KEYS.TRATAMENTOS) || [];
         },
-        
-        // Salvar tratamentos
+        // Salvar tratamentos do usuário ativo
         salvarTratamentos(tratamentos) {
-            try {
-                localStorage.setItem(this.KEYS.TRATAMENTOS, JSON.stringify(tratamentos));
-                return true;
-            } catch (error) {
-                console.error('Erro ao salvar tratamentos:', error);
-                UI.mostrarToast('Erro ao salvar tratamentos', 'error');
-                return false;
-            }
+            return this._saveData(this.BASE_KEYS.TRATAMENTOS, tratamentos);
         },
         
-        // Carregar doses di谩rias
+        // Carregar doses do usuário ativo
         carregarDoses() {
-            try {
-                return JSON.parse(localStorage.getItem(this.KEYS.DOSES)) || [];
-            } catch (error) {
-                console.error('Erro ao carregar doses:', error);
-                return [];
-            }
+            return this._getData(this.BASE_KEYS.DOSES) || [];
         },
-        
-        // Salvar doses di谩rias
+        // Salvar doses do usuário ativo
         salvarDoses(doses) {
-            try {
-                localStorage.setItem(this.KEYS.DOSES, JSON.stringify(doses));
-                return true;
-            } catch (error) {
-                console.error('Erro ao salvar doses:', error);
-                return false;
-            }
+            return this._saveData(this.BASE_KEYS.DOSES, doses);
         },
         
-        // Verificar se precisa gerar doses para hoje
+        // Verificar se precisa gerar doses para hoje para o usuário ativo
         precisaGerarDosesHoje() {
+            const userKey = this._getUserKey(this.BASE_KEYS.ULTIMA_GERACAO);
+            if (!userKey) return false;
             const hoje = new Date().toLocaleDateString('pt-BR');
-            const ultimaGeracao = localStorage.getItem(this.KEYS.ULTIMA_GERACAO);
+            const ultimaGeracao = localStorage.getItem(userKey);
             return ultimaGeracao !== hoje;
         },
-        
-        // Marcar gera莽茫o de hoje como conclu铆da
+        // Marcar geração de hoje como concluída para o usuário ativo
         marcarGeracaoHoje() {
+            const userKey = this._getUserKey(this.BASE_KEYS.ULTIMA_GERACAO);
+            if (!userKey) return;
             const hoje = new Date().toLocaleDateString('pt-BR');
-            localStorage.setItem(this.KEYS.ULTIMA_GERACAO, hoje);
+            localStorage.setItem(userKey, hoje);
         },
         
-        // Carregar prefer锚ncia de modo escuro
+        // --- Configurações Globais ---
         carregarDarkMode() {
-            return localStorage.getItem(this.KEYS.DARK_MODE) === 'true';
+            return localStorage.getItem(this.GLOBAL_KEYS.DARK_MODE) === 'true';
         },
-        
-        // Salvar prefer锚ncia de modo escuro
         salvarDarkMode(ativado) {
-            localStorage.setItem(this.KEYS.DARK_MODE, ativado.toString());
+            localStorage.setItem(this.GLOBAL_KEYS.DARK_MODE, ativado.toString());
         },
-        
-        // Carregar configura莽茫o de notifica莽玫es
+
+        // --- Configurações por Usuário ---
         carregarNotificacoes() {
-            return localStorage.getItem(this.KEYS.NOTIFICACOES) === 'true';
+            return this._getData(this.BASE_KEYS.NOTIFICACOES) || false;
         },
-        
-        // Salvar configura莽茫o de notifica莽玫es
         salvarNotificacoes(ativado) {
-            localStorage.setItem(this.KEYS.NOTIFICACOES, ativado.toString());
+            this._saveData(this.BASE_KEYS.NOTIFICACOES, ativado);
         },
-        
-        // Carregar anteced锚ncia de notifica莽茫o
         carregarAntecedencia() {
-            return parseInt(localStorage.getItem(this.KEYS.ANTECEDENCIA)) || 10;
+            return this._getData(this.BASE_KEYS.ANTECEDENCIA) || 10;
         },
-        
-        // Salvar anteced锚ncia de notifica莽茫o
         salvarAntecedencia(minutos) {
-            localStorage.setItem(this.KEYS.ANTECEDENCIA, minutos.toString());
+            this._saveData(this.BASE_KEYS.ANTECEDENCIA, minutos);
         }
     };
 
     // ========================================
-    // M脫DULO DE INTERFACE DO USU脕RIO
+    // MÓDULO DE INTERFACE DO USUÁRIO
     // ========================================
     const UI = {
-        // Mostrar toast de notifica莽茫o
+        // Mostrar toast de notificação
         mostrarToast(mensagem, tipo = 'info') {
             const toast = document.createElement('div');
-            toast.className = `toast toast-${tipo}`;
+toast.className = `toast toast-${tipo}`;
             toast.textContent = mensagem;
             document.body.appendChild(toast);
             
@@ -526,190 +642,189 @@
                 toast.style.animation = 'slideInRight 0.3s ease-out reverse';
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
-        },
+},
         
-        // Validar campo de formul谩rio
+        // Validar campo de formulário
         validarCampo(campo, mensagemErro) {
             const errorElement = document.getElementById(`error-${campo.id}`);
-            if (!campo.value.trim()) {
+if (!campo.value.trim()) {
                 campo.classList.add('input-error');
-                if (errorElement) {
+if (errorElement) {
                     errorElement.textContent = mensagemErro;
-                    errorElement.classList.remove('hidden');
+errorElement.classList.remove('hidden');
                 }
                 return false;
-            } else {
+} else {
                 campo.classList.remove('input-error');
-                if (errorElement) {
+if (errorElement) {
                     errorElement.classList.add('hidden');
-                }
+}
                 return true;
-            }
+}
         },
         
-        // Limpar erros de valida莽茫o
+        // Limpar erros de validação
         limparErros() {
             document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
-            document.querySelectorAll('.error-message').forEach(el => el.classList.add('hidden'));
+document.querySelectorAll('.error-message').forEach(el => el.classList.add('hidden'));
         },
         
         // Alternar modo escuro
         toggleDarkMode() {
             const isDark = document.body.classList.toggle('dark-mode');
-            DataManager.salvarDarkMode(isDark);
+DataManager.salvarDarkMode(isDark);
             this.mostrarToast(`Modo ${isDark ? 'escuro' : 'claro'} ativado`, 'info');
         },
         
-        // Aplicar modo escuro se necess谩rio
+        // Aplicar modo escuro se necessário
         aplicarDarkMode() {
             if (DataManager.carregarDarkMode()) {
                 document.body.classList.add('dark-mode');
-            }
+}
         },
         
-        // Formatar data para exibi莽茫o
+        // Formatar data para exibição
         formatarData(data) {
             return new Date(data).toLocaleDateString('pt-BR', { 
                 weekday: 'long', 
                 day: 'numeric', 
-                month: 'long',
+           
+     month: 'long',
                 year: 'numeric'
             });
-        },
+},
         
-        // Formatar hor谩rio
+        // Formatar horário
         formatarHorario(horario) {
             return horario;
-        },
+},
         
-        // Calcular tempo at茅 pr贸xima dose
+        // Calcular tempo até próxima dose
         calcularTempoAteProximaDose(horario) {
             const agora = new Date();
-            const [horas, minutos] = horario.split(':');
+const [horas, minutos] = horario.split(':');
             const proximaDose = new Date();
             proximaDose.setHours(parseInt(horas), parseInt(minutos), 0, 0);
-            
-            if (proximaDose < agora) {
+if (proximaDose < agora) {
                 proximaDose.setDate(proximaDose.getDate() + 1);
-            }
+}
             
             const diff = proximaDose - agora;
-            const horasRestantes = Math.floor(diff / (1000 * 60 * 60));
-            const minutosRestantes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            
-            if (horasRestantes === 0) {
+const horasRestantes = Math.floor(diff / (1000 * 60 * 60));
+const minutosRestantes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+if (horasRestantes === 0) {
                 return `em ${minutosRestantes} minutos`;
-            } else if (horasRestantes < 24) {
+} else if (horasRestantes < 24) {
                 return `em ${horasRestantes}h ${minutosRestantes}min`;
-            } else {
-                return 'amanh茫';
-            }
+} else {
+                return 'amanhã';
+}
         }
     };
-
-    // ========================================
-    // M脫DULO DE NOTIFICA脟脮ES
+// ========================================
+    // MÓDULO DE NOTIFICAÇÕES
     // ========================================
     const NotificationManager = {
         permissaoAtiva: false,
         intervaloVerificacao: null,
         
-        // Verificar e solicitar permiss茫o
+        // Verificar e solicitar permissão
         async solicitarPermissao() {
             if (!('Notification' in window)) {
-                UI.mostrarToast('Seu navegador n茫o suporta notifica莽玫es', 'error');
+                
+UI.mostrarToast('Seu navegador não suporta notificações', 'error');
                 return false;
             }
             
             if (Notification.permission === 'granted') {
                 this.permissaoAtiva = true;
-                return true;
+return true;
             }
             
             if (Notification.permission !== 'denied') {
                 const permission = await Notification.requestPermission();
-                this.permissaoAtiva = permission === 'granted';
+this.permissaoAtiva = permission === 'granted';
                 return this.permissaoAtiva;
             }
             
             return false;
-        },
+},
         
-        // Enviar notifica莽茫o
-        enviarNotificacao(titulo, corpo, icone = '馃拪') {
+        // Enviar notificação
+        enviarNotificacao(titulo, corpo, icone = '💊') {
             if (!this.permissaoAtiva) return;
-            
-            try {
+try {
                 const notification = new Notification(titulo, {
                     body: corpo,
-                    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="75" font-size="75">馃拪</text></svg>',
-                    badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="75" font-size="75">馃拪</text></svg>',
-                    tag: 'medicamento-lembrete',
+                    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="75" font-size="75">💊</text></svg>',
+                    badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="75" font-size="75">💊</text></svg>',
+ 
+                   tag: 'medicamento-lembrete',
                     requireInteraction: true,
                     vibrate: [200, 100, 200]
                 });
-                
-                notification.onclick = () => {
+notification.onclick = () => {
                     window.focus();
-                    notification.close();
+notification.close();
                 };
             } catch (error) {
-                console.error('Erro ao enviar notifica莽茫o:', error);
-            }
+                console.error('Erro ao enviar notificação:', error);
+}
         },
         
-        // Iniciar verifica莽茫o de hor谩rios
+        // Iniciar verificação de horários
         iniciarVerificacao() {
             if (this.intervaloVerificacao) {
                 clearInterval(this.intervaloVerificacao);
-            }
+}
             
             // Verificar a cada minuto
             this.intervaloVerificacao = setInterval(() => {
                 this.verificarHorarios();
             }, 60000);
-            
-            // Verificar imediatamente
+// Verificar imediatamente
             this.verificarHorarios();
-        },
+},
         
-        // Verificar hor谩rios para notifica莽玫es
+        // Verificar horários para notificações
         verificarHorarios() {
             if (!DataManager.carregarNotificacoes() || !this.permissaoAtiva) return;
-            
-            const doses = DataManager.carregarDoses();
+const doses = DataManager.carregarDoses();
+            if (!doses) return; // Nenhum usuário ativo
             const agora = new Date();
             const antecedencia = DataManager.carregarAntecedencia();
-            
-            doses.forEach(dose => {
+doses.forEach(dose => {
                 if (dose.concluido) return;
                 
                 const [horas, minutos] = dose.horario.split(':');
                 const horarioDose = new Date();
                 horarioDose.setHours(parseInt(horas), parseInt(minutos) - antecedencia, 0, 0);
-                
-                // Verificar se est谩 no hor谩rio (com margem de 1 minuto)
+   
+             
+                // Verificar se está no horário (com margem de 1 minuto)
                 const diff = Math.abs(agora - horarioDose);
-                if (diff < 60000) { // Menos de 1 minuto de diferen莽a
-                    const titulo = `鈴� Hora do rem茅dio: ${dose.nome}`;
+                if (diff < 60000) { // Menos de 1 minuto de diferença
+             
+       const titulo = `⏰ Hora do remédio: ${dose.nome}`;
                     const corpo = `${dose.dosagem} - ${dose.horario}\n${dose.instrucoes}`;
                     this.enviarNotificacao(titulo, corpo);
                 }
             });
-        },
+},
         
-        // Parar verifica莽茫o
+        // Parar verificação
         pararVerificacao() {
             if (this.intervaloVerificacao) {
                 clearInterval(this.intervaloVerificacao);
-                this.intervaloVerificacao = null;
+this.intervaloVerificacao = null;
             }
         },
         
-        // Atualizar badge de notifica莽玫es pendentes
+        // Atualizar badge de notificações pendentes
         atualizarBadge() {
             const doses = DataManager.carregarDoses();
-            const agora = new Date();
+            if (!doses) return; // Nenhum usuário ativo
+const agora = new Date();
             let pendentes = 0;
             
             doses.forEach(dose => {
@@ -717,46 +832,44 @@
                 
                 const [horas, minutos] = dose.horario.split(':');
                 const horarioDose = new Date();
-                horarioDose.setHours(parseInt(horas), parseInt(minutos), 0, 0);
+               
+ horarioDose.setHours(parseInt(horas), parseInt(minutos), 0, 0);
                 
                 if (horarioDose <= agora) {
                     pendentes++;
                 }
             });
-            
-            const badge = document.getElementById('notification-badge');
+const badge = document.getElementById('notification-badge');
             if (pendentes > 0) {
                 badge.textContent = pendentes;
-                badge.classList.remove('hidden');
+badge.classList.remove('hidden');
             } else {
                 badge.classList.add('hidden');
-            }
+}
         }
     };
-
-    // ========================================
-    // M脫DULO DE GERENCIAMENTO DE TRATAMENTOS
+// ========================================
+    // MÓDULO DE GERENCIAMENTO DE TRATAMENTOS
     // ========================================
     const TreatmentManager = {
         tratamentos: [],
         dosesDiarias: [],
         
-        // Inicializar
+        // Inicializar para o usuário ativo
         init() {
             this.tratamentos = DataManager.carregarTratamentos();
-            
-            if (DataManager.precisaGerarDosesHoje()) {
+if (DataManager.precisaGerarDosesHoje()) {
                 this.gerarDosesParaHoje();
                 DataManager.marcarGeracaoHoje();
-            } else {
+} else {
                 this.dosesDiarias = DataManager.carregarDoses();
-            }
+}
         },
         
         // Gerar doses para hoje
         gerarDosesParaHoje() {
             const hoje = new Date();
-            hoje.setHours(0, 0, 0, 0);
+hoje.setHours(0, 0, 0, 0);
             this.dosesDiarias = [];
 
             this.tratamentos.forEach(trat => {
@@ -764,31 +877,37 @@
                 dataInicio.setHours(0, 0, 0, 0);
                 
                 const diffTime = hoje - dataInicio;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+               
+ const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-                // Verificar se 茅 tratamento cont铆nuo ou se ainda est谩 dentro da dura莽茫o
+                // Verificar se é tratamento contínuo ou se ainda está dentro da duração
                 const dentroDoTratamento = trat.tipotratamento === 'continuo' || 
-                                          (diffDays >= 0 && diffDays < trat.duracao);
+                                     
+     (diffDays >= 0 && diffDays < trat.duracao);
 
                 if (dentroDoTratamento) {
                     trat.horarios.forEach(horario => {
                         this.dosesDiarias.push({
-                            id: `${trat.id}-${horario}`,
+                         
+   id: `${trat.id}-${horario}`,
                             tratamentoId: trat.id,
                             nome: trat.nome,
                             dosagem: trat.dosagem,
-                            horario: horario,
+         
+                   horario: horario,
                             instrucoes: trat.instrucoes,
-                            diaAtual: trat.tipotratamento === 'continuo' ? '鈭�' : diffDays + 1,
-                            duracaoTotal: trat.tipotratamento === 'continuo' ? '鈭�' : trat.duracao,
+                            diaAtual: trat.tipotratamento === 'continuo' ?
+'∞' : diffDays + 1,
+                            duracaoTotal: trat.tipotratamento === 'continuo' ?
+'∞' : trat.duracao,
                             concluido: false
                         });
-                    });
+});
                 }
             });
             
             DataManager.salvarDoses(this.dosesDiarias);
-        },
+},
         
         // Adicionar tratamento
         adicionarTratamento(dados) {
@@ -796,793 +915,977 @@
                 ...dados,
                 id: Date.now().toString(),
                 dataInicio: new Date().toISOString()
-            };
+       
+     };
             
             this.tratamentos.push(novoTratamento);
             
             if (DataManager.salvarTratamentos(this.tratamentos)) {
                 this.gerarDosesParaHoje();
-                DataManager.marcarGeracaoHoje();
+DataManager.marcarGeracaoHoje();
                 UI.mostrarToast('Tratamento adicionado com sucesso!', 'success');
                 return true;
             }
             
             return false;
-        },
+},
         
         // Editar tratamento
         editarTratamento(id, dados) {
             const index = this.tratamentos.findIndex(t => t.id === id);
-            if (index === -1) return false;
+if (index === -1) return false;
             
             this.tratamentos[index] = { 
                 ...this.tratamentos[index], 
                 ...dados 
             };
-            
-            if (DataManager.salvarTratamentos(this.tratamentos)) {
+if (DataManager.salvarTratamentos(this.tratamentos)) {
                 this.gerarDosesParaHoje();
                 DataManager.marcarGeracaoHoje();
-                UI.mostrarToast('Tratamento atualizado com sucesso!', 'success');
+UI.mostrarToast('Tratamento atualizado com sucesso!', 'success');
                 return true;
             }
             
             return false;
-        },
+},
         
         // Excluir tratamento
         excluirTratamento(id) {
             this.tratamentos = this.tratamentos.filter(t => t.id !== id);
-            
-            if (DataManager.salvarTratamentos(this.tratamentos)) {
+if (DataManager.salvarTratamentos(this.tratamentos)) {
                 this.gerarDosesParaHoje();
                 DataManager.marcarGeracaoHoje();
-                UI.mostrarToast('Tratamento exclu铆do com sucesso!', 'success');
+UI.mostrarToast('Tratamento excluído com sucesso!', 'success');
                 return true;
             }
             
             return false;
-        },
+},
         
-        // Marcar dose como conclu铆da/n茫o conclu铆da
+        // Marcar dose como concluída/não concluída
         toggleDose(id) {
             const dose = this.dosesDiarias.find(d => d.id === id);
-            if (!dose) return false;
+if (!dose) return false;
             
             dose.concluido = !dose.concluido;
             DataManager.salvarDoses(this.dosesDiarias);
             
             if (dose.concluido) {
-                UI.mostrarToast(`鉁� ${dose.nome} marcado como tomado!`, 'success');
-            }
+                UI.mostrarToast(`✓ ${dose.nome} marcado como tomado!`, 'success');
+}
             
             return true;
-        },
+},
         
-        // Obter pr贸xima dose
+        // Obter próxima dose
         obterProximaDose() {
             const agora = new Date();
-            const dosesNaoConcluidas = this.dosesDiarias.filter(d => !d.concluido);
+const dosesNaoConcluidas = this.dosesDiarias.filter(d => !d.concluido);
             
             if (dosesNaoConcluidas.length === 0) return null;
-            
-            // Ordenar por hor谩rio
+// Ordenar por horário
             dosesNaoConcluidas.sort((a, b) => a.horario.localeCompare(b.horario));
-            
-            // Encontrar a pr贸xima dose
+// Encontrar a próxima dose
             for (const dose of dosesNaoConcluidas) {
                 const [horas, minutos] = dose.horario.split(':');
-                const horarioDose = new Date();
+const horarioDose = new Date();
                 horarioDose.setHours(parseInt(horas), parseInt(minutos), 0, 0);
                 
                 if (horarioDose >= agora) {
                     return dose;
-                }
+}
             }
             
-            // Se todas as doses de hoje j谩 passaram, retornar a primeira de amanh茫
+            // Se todas as doses de hoje já passaram, retornar a primeira de amanhã
             return dosesNaoConcluidas[0];
-        },
+},
         
-        // Verificar se todas as doses foram conclu铆das
+        // Verificar se todas as doses foram concluídas
         todasDosesConcluidas() {
             return this.dosesDiarias.length > 0 && 
                    this.dosesDiarias.every(d => d.concluido);
-        },
+},
         
-        // Obter estat铆sticas
+        // Obter estatísticas
         obterEstatisticas() {
             const hoje = new Date();
-            hoje.setHours(0, 0, 0, 0);
+hoje.setHours(0, 0, 0, 0);
             
             let ativos = 0;
             let concluidos = 0;
-            
-            this.tratamentos.forEach(trat => {
+this.tratamentos.forEach(trat => {
                 const dataInicio = new Date(trat.dataInicio);
                 dataInicio.setHours(0, 0, 0, 0);
                 
                 const diffTime = hoje - dataInicio;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                const diffDays = Math.ceil(diffTime / (1000 
+* 60 * 60 * 24));
                 
                 if (trat.tipotratamento === 'continuo') {
                     ativos++;
                 } else if (diffDays >= 0 && diffDays < trat.duracao) {
-                    ativos++;
+             
+       ativos++;
                 } else if (diffDays >= trat.duracao) {
                     concluidos++;
                 }
             });
-            
-            return {
+return {
                 total: this.tratamentos.length,
                 ativos,
                 concluidos
             };
-        }
+}
     };
 
     // ========================================
-    // M脫DULO DE RENDERIZA脟脙O
+    // MÓDULO DE RENDERIZAÇÃO
     // ========================================
     const Renderer = {
-        // Renderizar doses di谩rias
+
+        // Renderiza a interface principal com base no usuário ativo
+        renderApp() {
+            const activeUserId = DataManager.getActiveUserId();
+            const mainControls = document.getElementById('main-controls');
+            const footerProgress = document.getElementById('footer-progress');
+            const placeholder = document.getElementById('placeholder');
+            const placeholderIcon = document.getElementById('placeholder-icon');
+            const placeholderTitle = document.getElementById('placeholder-title');
+            const placeholderSubtitle = document.getElementById('placeholder-subtitle');
+
+            if (activeUserId) {
+                mainControls.style.display = 'flex';
+                footerProgress.style.display = 'block';
+                TreatmentManager.init(); // Inicializa os dados do usuário
+                this.renderDosesDiarias();
+            } else {
+                // Esconde a interface principal se nenhum usuário estiver selecionado
+                document.getElementById('checklist-container').innerHTML = '';
+                mainControls.style.display = 'none';
+                footerProgress.style.display = 'none';
+                placeholder.style.display = 'block';
+                
+                placeholderIcon.textContent = '👥';
+                placeholderTitle.textContent = 'Selecione ou crie um perfil de paciente para começar.';
+                placeholderSubtitle.textContent = 'Use o menu "Paciente" acima para gerenciar os perfis.';
+            }
+        },
+
+        // Renderizar doses diárias
         renderDosesDiarias() {
             const container = document.getElementById('checklist-container');
-            const placeholder = document.getElementById('placeholder');
+const placeholder = document.getElementById('placeholder');
+            const placeholderIcon = document.getElementById('placeholder-icon');
+            const placeholderTitle = document.getElementById('placeholder-title');
+            const placeholderSubtitle = document.getElementById('placeholder-subtitle');
             
             container.innerHTML = '';
             
             if (TreatmentManager.dosesDiarias.length === 0) {
                 placeholder.style.display = 'block';
-                container.style.display = 'none';
+container.style.display = 'none';
+                placeholderIcon.textContent = '💊';
+                placeholderTitle.textContent = 'Nenhum tratamento ativo para hoje.';
+                placeholderSubtitle.textContent = 'Clique no botão "Adicionar Tratamento" acima para começar!';
+                this.atualizarProgresso(); // Zera o progresso
+                this.atualizarProximaDose();
+                NotificationManager.atualizarBadge();
                 return;
             }
             
             placeholder.style.display = 'none';
-            container.style.display = 'block';
+container.style.display = 'block';
             
-            // Agrupar por per铆odo
+            // Agrupar por período
             const groupedMeds = { 
-                'Manh茫 鈽€锔�': [], 
-                'Tarde 馃寚': [], 
-                'Noite 馃寵': [] 
+                'Manhã ☀️': [], 
+                'Tarde 🌇': [], 
+                'Noite 🌙': [] 
             };
-            
-            TreatmentManager.dosesDiarias.sort((a, b) => a.horario.localeCompare(b.horario));
+TreatmentManager.dosesDiarias.sort((a, b) => a.horario.localeCompare(b.horario));
             
             TreatmentManager.dosesDiarias.forEach(dose => {
                 const hour = parseInt(dose.horario.split(':')[0], 10);
-                if (hour >= 4 && hour < 12) groupedMeds['Manh茫 鈽€锔�'].push(dose);
-                else if (hour >= 12 && hour < 18) groupedMeds['Tarde 馃寚'].push(dose);
-                else groupedMeds['Noite 馃寵'].push(dose);
-            });
+                if (hour >= 4 && hour < 12) groupedMeds['Manhã ☀️'].push(dose);
+                else if (hour >= 12 && hour < 18) groupedMeds['Tarde 🌇'].push(dose);
+                else groupedMeds['Noite 🌙'].push(dose);
+     
+       });
             
             for (const periodo in groupedMeds) {
                 if (groupedMeds[periodo].length > 0) {
                     const section = document.createElement('section');
-                    section.className = 'fade-in-scale';
+section.className = 'fade-in-scale';
                     section.innerHTML = `<h2 class="text-3xl font-bold text-white pb-2 mb-4 drop-shadow-lg">${periodo}</h2>`;
                     groupedMeds[periodo].forEach(dose => section.appendChild(this.createMedCard(dose)));
                     container.appendChild(section);
-                }
+}
             }
             
             this.atualizarProgresso();
-            this.atualizarProximaDose();
+this.atualizarProximaDose();
             NotificationManager.atualizarBadge();
         },
         
         // Criar card de medicamento
         createMedCard(dose) {
             const card = document.createElement('div');
-            const agora = new Date();
+const agora = new Date();
             const [horas, minutos] = dose.horario.split(':');
             const horarioDose = new Date();
             horarioDose.setHours(parseInt(horas), parseInt(minutos), 0, 0);
-            
-            let cardClass = 'bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border-l-8 border-gray-300 transition-all duration-300 cursor-pointer p-5 flex items-center gap-5 fade-in-scale hover:shadow-xl hover:scale-[1.02]';
-            
-            if (dose.concluido) {
+let cardClass = 'bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border-l-8 border-gray-300 transition-all duration-300 cursor-pointer p-5 flex items-center gap-5 fade-in-scale hover:shadow-xl hover:scale-[1.02]';
+if (dose.concluido) {
                 cardClass += ' card-concluido';
-            } else if (horarioDose < agora) {
+} else if (horarioDose < agora) {
                 cardClass += ' card-atrasado';
-            } else {
+} else {
                 const diff = horarioDose - agora;
-                if (diff < 30 * 60 * 1000) { // Menos de 30 minutos
+if (diff < 30 * 60 * 1000) { // Menos de 30 minutos
                     cardClass += ' card-proximo';
-                }
+}
             }
             
             card.className = cardClass;
-            card.dataset.id = dose.id;
+card.dataset.id = dose.id;
             
-            const diaInfo = dose.duracaoTotal === '鈭�' 
-                ? '(Cont铆nuo)' 
+            const diaInfo = dose.duracaoTotal === '∞' 
+                ?
+'(Contínuo)' 
                 : `(Dia ${dose.diaAtual}/${dose.duracaoTotal})`;
-            
-            card.innerHTML = `
-                <div class="text-5xl flex-shrink-0">${dose.concluido ? '鉁�' : '猬滐笍'}</div>
+card.innerHTML = `
+                <div class="text-5xl flex-shrink-0">${dose.concluido ?
+'✅' : '⬜️'}</div>
                 <div class="flex-grow info-remedio">
                     <h3 class="font-bold text-2xl">${dose.nome} <span class="text-lg font-medium text-gray-500">${diaInfo}</span></h3>
-                    <p class="text-gray-600 text-lg mt-1">馃拪 ${dose.dosagem}</p>
-                    <p class="text-gray-600 text-lg">鈴� ${dose.horario}</p>
-                    <p class="text-gray-600 text-lg">馃嵔锔� ${dose.instrucoes}</p>
+                    <p class="text-gray-600 text-lg mt-1">💊 ${dose.dosagem}</p>
+                    <p class="text-gray-600 text-lg">⏰ ${dose.horario}</p>
+       
+             <p class="text-gray-600 text-lg">🍽️ ${dose.instrucoes}</p>
                 </div>`;
-            
-            return card;
+return card;
         },
         
         // Atualizar barra de progresso
         atualizarProgresso() {
             const total = TreatmentManager.dosesDiarias.length;
-            const concluidos = TreatmentManager.dosesDiarias.filter(d => d.concluido).length;
+const concluidos = TreatmentManager.dosesDiarias.filter(d => d.concluido).length;
             const percent = total > 0 ? Math.round((concluidos / total) * 100) : 0;
-            
-            const progressBar = document.getElementById('progress-bar');
+const progressBar = document.getElementById('progress-bar');
             const progressText = document.getElementById('progress-text');
             
             progressBar.style.width = `${percent}%`;
             progressBar.textContent = total > 0 ? `${percent}%` : '';
-            progressText.textContent = total > 0 
-                ? `Voc锚 tomou ${concluidos} de ${total} medicamentos hoje.` 
+progressText.textContent = total > 0 
+                ?
+`Você tomou ${concluidos} de ${total} medicamentos hoje.` 
                 : 'Nenhum medicamento para hoje.';
-        },
+},
         
-        // Atualizar informa莽茫o da pr贸xima dose
+        // Atualizar informação da próxima dose
         atualizarProximaDose() {
             const proximaDose = TreatmentManager.obterProximaDose();
-            const container = document.getElementById('next-dose-info');
+const container = document.getElementById('next-dose-info');
             const text = document.getElementById('next-dose-text');
             
             if (proximaDose) {
                 const tempo = UI.calcularTempoAteProximaDose(proximaDose.horario);
-                text.textContent = `${proximaDose.nome} 脿s ${proximaDose.horario} (${tempo})`;
+text.textContent = `${proximaDose.nome} às ${proximaDose.horario} (${tempo})`;
                 container.classList.remove('hidden');
             } else {
                 container.classList.add('hidden');
-            }
+}
         },
         
-        // Renderizar relat贸rio
+        // Renderizar relatório
         renderRelatorio() {
             const conteudo = document.getElementById('relatorio-conteudo');
-            document.getElementById('relatorio-data').textContent = new Date().toLocaleDateString('pt-BR');
+document.getElementById('relatorio-data').textContent = new Date().toLocaleDateString('pt-BR');
             
             conteudo.innerHTML = '';
             
             if (TreatmentManager.tratamentos.length === 0) {
-                conteudo.innerHTML = '<p class="text-center text-gray-500 py-8">Nenhum tratamento cadastrado.</p>';
+                conteudo.innerHTML = '<p class="text-center text-gray-500 py-8">Nenhum tratamento cadastrado para este paciente.</p>';
+                document.getElementById('stats-total').textContent = 0;
+                document.getElementById('stats-ativos').textContent = 0;
+                document.getElementById('stats-concluidos').textContent = 0;
                 return;
             }
             
-            // Atualizar estat铆sticas
+            // Atualizar estatísticas
             const stats = TreatmentManager.obterEstatisticas();
-            document.getElementById('stats-total').textContent = stats.total;
+document.getElementById('stats-total').textContent = stats.total;
             document.getElementById('stats-ativos').textContent = stats.ativos;
             document.getElementById('stats-concluidos').textContent = stats.concluidos;
             
             const hoje = new Date();
             hoje.setHours(0, 0, 0, 0);
-
-            TreatmentManager.tratamentos.forEach(trat => {
+TreatmentManager.tratamentos.forEach(trat => {
                 const dataInicio = new Date(trat.dataInicio);
                 dataInicio.setHours(0, 0, 0, 0);
                 const diffTime = hoje - dataInicio;
                 const diasPassados = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
-                
+          
+      
                 let diaAtual, progresso, statusBadge;
                 
                 if (trat.tipotratamento === 'continuo') {
-                    diaAtual = '鈭�';
-                    progresso = 100;
-                    statusBadge = '<span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">Cont铆nuo</span>';
+                    diaAtual = '∞';
+                 
+   progresso = 100;
+                    statusBadge = '<span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">Contínuo</span>';
                 } else {
                     diaAtual = Math.min(diasPassados + 1, trat.duracao);
-                    progresso = Math.min(100, Math.round((diaAtual / trat.duracao) * 100));
+                    progresso = Math.min(100, 
+Math.round((diaAtual / trat.duracao) * 100));
                     
                     if (diaAtual >= trat.duracao) {
-                        statusBadge = '<span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">Conclu铆do</span>';
-                    } else {
+                        statusBadge = '<span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">Concluído</span>';
+} else {
                         statusBadge = '<span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-semibold">Em andamento</span>';
-                    }
+}
                 }
 
                 const itemRelatorio = document.createElement('div');
-                itemRelatorio.className = 'p-5 border-2 border-gray-200 rounded-xl relative hover:border-blue-300 transition bg-gradient-to-r from-white to-gray-50';
-                itemRelatorio.innerHTML = `
+itemRelatorio.className = 'p-5 border-2 border-gray-200 rounded-xl relative hover:border-blue-300 transition bg-gradient-to-r from-white to-gray-50';
+itemRelatorio.innerHTML = `
                     <div class="absolute top-3 right-3 flex gap-2 no-print">
                         <button class="btn-edit btn-icon p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" data-id="${trat.id}" title="Editar">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+  
+                              <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
                                 <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
-                            </svg>
+    
+                        </svg>
                         </button>
                         <button class="btn-delete btn-icon p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition" data-id="${trat.id}" title="Excluir">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                            </svg>
+   
+                         </svg>
                         </button>
                     </div>
                     <div class="pr-20">
-                        <div class="flex items-center gap-3 mb-2">
+          
+              <div class="flex items-center gap-3 mb-2">
                             <h3 class="font-bold text-xl">${trat.nome}</h3>
                             ${statusBadge}
-                        </div>
+                        
+</div>
                         <p class="text-gray-600 mb-1"><span class="font-semibold">Dose:</span> ${trat.dosagem}</p>
-                        <p class="text-gray-600 mb-1"><span class="font-semibold">Hor谩rios:</span> ${trat.horarios.join(', ')}</p>
-                        <p class="text-gray-600 mb-1"><span class="font-semibold">Instru莽玫es:</span> ${trat.instrucoes}</p>
-                        <p class="text-sm text-gray-500 mt-2">In铆cio: ${dataInicio.toLocaleDateString('pt-BR')}</p>
+                        <p class="text-gray-600 mb-1"><span class="font-semibold">Horários:</span> ${trat.horarios.join(', ')}</p>
+                        <p class="text-gray-600 mb-1"><span class="font-semibold">Instruções:</span> ${trat.instrucoes}</p>
+               
+         <p class="text-sm text-gray-500 mt-2">Início: ${dataInicio.toLocaleDateString('pt-BR')}</p>
                     </div>
                     <div class="mt-4">
                         <div class="flex justify-between items-center mb-2">
-                            <span class="text-base font-semibold text-blue-700">
-                                ${trat.tipotratamento === 'continuo' ? 'Tratamento Cont铆nuo' : `Dia ${diaAtual} de ${trat.duracao}`}
+                  
+          <span class="text-base font-semibold text-blue-700">
+                                ${trat.tipotratamento === 'continuo' ?
+'Tratamento Contínuo' : `Dia ${diaAtual} de ${trat.duracao}`}
                             </span>
                             <span class="font-bold text-lg">${progresso}%</span>
                         </div>
-                        <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+            
+            <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
                             <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-500" style="width: ${progresso}%"></div>
                         </div>
                     </div>`;
-                conteudo.appendChild(itemRelatorio);
+conteudo.appendChild(itemRelatorio);
             });
         }
     };
 
     // ========================================
-    // M脫DULO DE FORMUL脕RIO
+    // MÓDULO DE FORMULÁRIO
     // ========================================
     const FormManager = {
-        // Limpar formul谩rio
+        // Limpar formulário
         limparFormulario() {
             document.getElementById('form-remedio').reset();
-            document.getElementById('tratamento-id').value = '';
+document.getElementById('tratamento-id').value = '';
             document.getElementById('modal-title').textContent = 'Novo Tratamento';
             document.getElementById('horarios-container').innerHTML = '';
             document.getElementById('instrucoes-personalizadas-container').classList.add('hidden');
             document.getElementById('duracao-container').style.display = 'block';
             UI.limparErros();
             this.adicionarCampoHorario();
-        },
+},
         
-        // Adicionar campo de hor谩rio
+        // Adicionar campo de horário
         adicionarCampoHorario(horario = '') {
             const container = document.getElementById('horarios-container');
-            const div = document.createElement('div');
+const div = document.createElement('div');
             div.className = 'flex items-center gap-2';
             div.innerHTML = `
                 <input type="time" value="${horario}" required class="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
-                <button type="button" class="btn-remove-horario text-red-500 hover:text-red-700 hover:bg-red-50 font-bold text-2xl px-3 py-2 rounded-lg transition">脳</button>`;
-            container.appendChild(div);
+                <button type="button" class="btn-remove-horario text-red-500 hover:text-red-700 hover:bg-red-50 font-bold text-2xl px-3 py-2 rounded-lg transition">×</button>`;
+container.appendChild(div);
             
             div.querySelector('.btn-remove-horario').addEventListener('click', () => {
                 if (container.children.length > 1) {
                     div.remove();
                 } else {
-                    UI.mostrarToast('脡 necess谩rio pelo menos um hor谩rio', 'error');
-                }
+                    UI.mostrarToast('É necessário pelo menos um horário', 'error');
+            
+    }
             });
-        },
+},
         
-        // Preencher hor谩rios por sugest茫o
+        // Preencher horários por sugestão
         preencherHorariosSugestao(intervalo) {
             const container = document.getElementById('horarios-container');
-            container.innerHTML = '';
+container.innerHTML = '';
             
             const numDoses = 24 / intervalo;
             for (let i = 0; i < numDoses; i++) {
-                const hora = (8 + (i * intervalo)) % 24; // Come莽ar 脿s 8h
+                const hora = (8 + (i * intervalo)) % 24;
+// Começar às 8h
                 const horarioFormatado = `${hora.toString().padStart(2, '0')}:00`;
-                this.adicionarCampoHorario(horarioFormatado);
+this.adicionarCampoHorario(horarioFormatado);
             }
             
-            UI.mostrarToast(`Hor谩rios sugeridos adicionados (a cada ${intervalo}h)`, 'info');
-        },
+            UI.mostrarToast(`Horários sugeridos adicionados (a cada ${intervalo}h)`, 'info');
+},
         
-        // Validar formul谩rio
+        // Validar formulário
         validarFormulario() {
             let valido = true;
-            
-            const nomeRemedio = document.getElementById('nome-remedio');
-            if (!UI.validarCampo(nomeRemedio, 'Por favor, informe o nome do rem茅dio')) {
+const nomeRemedio = document.getElementById('nome-remedio');
+            if (!UI.validarCampo(nomeRemedio, 'Por favor, informe o nome do remédio')) {
                 valido = false;
-            }
+}
             
             const dosagemRemedio = document.getElementById('dosagem-remedio');
-            if (!UI.validarCampo(dosagemRemedio, 'Por favor, informe a dosagem')) {
+if (!UI.validarCampo(dosagemRemedio, 'Por favor, informe a dosagem')) {
                 valido = false;
-            }
+}
             
             const tipoTratamento = document.getElementById('tipo-tratamento').value;
-            if (tipoTratamento === 'temporario') {
+if (tipoTratamento === 'temporario') {
                 const duracaoTratamento = document.getElementById('duracao-tratamento');
-                if (!duracaoTratamento.value || parseInt(duracaoTratamento.value) < 1) {
+if (!duracaoTratamento.value || parseInt(duracaoTratamento.value) < 1) {
                     duracaoTratamento.classList.add('input-error');
-                    document.getElementById('error-duracao-tratamento').textContent = 'Informe a dura莽茫o do tratamento';
+document.getElementById('error-duracao-tratamento').textContent = 'Informe a duração do tratamento';
                     document.getElementById('error-duracao-tratamento').classList.remove('hidden');
                     valido = false;
-                }
+}
             }
             
             const horarios = Array.from(document.querySelectorAll('#horarios-container input[type="time"]'))
                 .map(input => input.value)
                 .filter(Boolean);
-            
-            if (horarios.length === 0) {
-                document.getElementById('error-horarios').textContent = 'Adicione pelo menos um hor谩rio';
-                document.getElementById('error-horarios').classList.remove('hidden');
+if (horarios.length === 0) {
+                document.getElementById('error-horarios').textContent = 'Adicione pelo menos um horário';
+document.getElementById('error-horarios').classList.remove('hidden');
                 valido = false;
             } else {
                 document.getElementById('error-horarios').classList.add('hidden');
-            }
+}
             
             return valido;
-        },
+},
         
-        // Coletar dados do formul谩rio
+        // Coletar dados do formulário
         coletarDados() {
             const tipoTratamento = document.getElementById('tipo-tratamento').value;
-            const instrucoesSelect = document.getElementById('instrucoes-remedio').value;
+const instrucoesSelect = document.getElementById('instrucoes-remedio').value;
             
             let instrucoes = instrucoesSelect;
             if (instrucoesSelect === 'personalizado') {
-                instrucoes = document.getElementById('instrucoes-personalizadas').value.trim() || 'Conforme orienta莽茫o m茅dica';
+                instrucoes = document.getElementById('instrucoes-personalizadas').value.trim() ||
+'Conforme orientação médica';
             }
             
             const horarios = Array.from(document.querySelectorAll('#horarios-container input[type="time"]'))
                 .map(input => input.value)
                 .filter(Boolean)
                 .sort();
-            
-            return {
+return {
                 nome: document.getElementById('nome-remedio').value.trim(),
                 dosagem: document.getElementById('dosagem-remedio').value.trim(),
                 tipotratamento: tipoTratamento,
-                duracao: tipoTratamento === 'temporario' ? parseInt(document.getElementById('duracao-tratamento').value) : 999999,
+                duracao: tipoTratamento === 'temporario' ?
+parseInt(document.getElementById('duracao-tratamento').value) : 999999,
                 horarios: horarios,
                 instrucoes: instrucoes
             };
-        },
+},
         
-        // Preencher formul谩rio para edi莽茫o
+        // Preencher formulário para edição
         preencherFormulario(id) {
             const trat = TreatmentManager.tratamentos.find(t => t.id === id);
-            if (!trat) return;
+if (!trat) return;
             
             document.getElementById('tratamento-id').value = trat.id;
             document.getElementById('modal-title').textContent = 'Editar Tratamento';
             document.getElementById('nome-remedio').value = trat.nome;
             document.getElementById('dosagem-remedio').value = trat.dosagem;
-            document.getElementById('tipo-tratamento').value = trat.tipotratamento || 'temporario';
+            document.getElementById('tipo-tratamento').value = trat.tipotratamento ||
+'temporario';
             
             if (trat.tipotratamento === 'continuo') {
                 document.getElementById('duracao-container').style.display = 'none';
-            } else {
+} else {
                 document.getElementById('duracao-tratamento').value = trat.duracao;
-                document.getElementById('duracao-container').style.display = 'block';
+document.getElementById('duracao-container').style.display = 'block';
             }
             
-            // Verificar se 茅 instru莽茫o personalizada
+            // Verificar se é instrução personalizada
             const opcoesInstrucoes = Array.from(document.querySelectorAll('#instrucoes-remedio option')).map(opt => opt.value);
-            if (opcoesInstrucoes.includes(trat.instrucoes)) {
+if (opcoesInstrucoes.includes(trat.instrucoes)) {
                 document.getElementById('instrucoes-remedio').value = trat.instrucoes;
-            } else {
+} else {
                 document.getElementById('instrucoes-remedio').value = 'personalizado';
-                document.getElementById('instrucoes-personalizadas').value = trat.instrucoes;
+document.getElementById('instrucoes-personalizadas').value = trat.instrucoes;
                 document.getElementById('instrucoes-personalizadas-container').classList.remove('hidden');
             }
             
             document.getElementById('horarios-container').innerHTML = '';
-            trat.horarios.forEach(h => this.adicionarCampoHorario(h));
+trat.horarios.forEach(h => this.adicionarCampoHorario(h));
         }
     };
 
     // ========================================
-    // M脫DULO DE EXPORTA脟脙O
+    // MÓDULO DE EXPORTAÇÃO
     // ========================================
     const ExportManager = {
         // Exportar para CSV
         exportarCSV() {
             if (TreatmentManager.tratamentos.length === 0) {
                 UI.mostrarToast('Nenhum tratamento para exportar', 'error');
-                return;
+return;
             }
+
+            const users = DataManager.getUsers();
+            const activeUserId = DataManager.getActiveUserId();
+            const activeUser = users.find(u => u.id === activeUserId);
+            const userName = activeUser ? activeUser.name.replace(/\s/g, '_') : 'Paciente';
             
-            let csv = 'Nome,Dosagem,Tipo,Dura莽茫o (dias),Hor谩rios,Instru莽玫es,Data de In铆cio\n';
-            
-            TreatmentManager.tratamentos.forEach(trat => {
-                const tipo = trat.tipotratamento === 'continuo' ? 'Cont铆nuo' : 'Tempor谩rio';
+            let csv = 'Nome,Dosagem,Tipo,Duração (dias),Horários,Instruções,Data de Início\n';
+TreatmentManager.tratamentos.forEach(trat => {
+                const tipo = trat.tipotratamento === 'continuo' ? 'Contínuo' : 'Temporário';
                 const duracao = trat.tipotratamento === 'continuo' ? 'N/A' : trat.duracao;
                 const horarios = trat.horarios.join('; ');
                 const dataInicio = new Date(trat.dataInicio).toLocaleDateString('pt-BR');
-                
+        
+        
                 csv += `"${trat.nome}","${trat.dosagem}","${tipo}","${duracao}","${horarios}","${trat.instrucoes}","${dataInicio}"\n`;
             });
-            
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
             
             link.setAttribute('href', url);
-            link.setAttribute('download', `tratamentos_${new Date().toISOString().split('T')[0]}.csv`);
+link.setAttribute('download', `tratamentos_${userName}_${new Date().toISOString().split('T')[0]}.csv`);
             link.style.visibility = 'hidden';
             
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             
-            UI.mostrarToast('Relat贸rio exportado com sucesso!', 'success');
+            UI.mostrarToast('Relatório exportado com sucesso!', 'success');
         }
     };
 
     // ========================================
-    // INICIALIZA脟脙O DA APLICA脟脙O
+    // MÓDULO DE GERENCIAMENTO DE USUÁRIOS (LÓGICA)
+    // ========================================
+    const UserManager = {
+        init() {
+            this.renderUserSelector();
+            this.renderUserList();
+            
+            document.getElementById('user-selector').addEventListener('change', (e) => {
+                DataManager.setActiveUserId(e.target.value);
+                Renderer.renderApp();
+            });
+
+            document.getElementById('form-add-user').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const nameInput = document.getElementById('new-user-name');
+                const name = nameInput.value.trim();
+                if (name) {
+                    this.addUser(name);
+                    nameInput.value = '';
+                }
+            });
+            
+            document.getElementById('user-list-container').addEventListener('click', (e) => {
+                if (e.target.classList.contains('btn-delete-user')) {
+                    const userId = e.target.dataset.id;
+                    if (confirm('Tem certeza que deseja excluir este paciente e todos os seus dados? Esta ação é irreversível.')) {
+                        this.deleteUser(userId);
+                    }
+                }
+            });
+        },
+
+        addUser(name) {
+            const users = DataManager.getUsers();
+            const newUser = { id: Date.now().toString(), name: name };
+            users.push(newUser);
+            DataManager.saveUsers(users);
+            
+            this.renderUserSelector();
+            this.renderUserList();
+            
+            // Seleciona o novo usuário automaticamente
+            document.getElementById('user-selector').value = newUser.id;
+            DataManager.setActiveUserId(newUser.id);
+            Renderer.renderApp();
+
+            UI.mostrarToast(`Paciente "${name}" adicionado.`, 'success');
+        },
+
+        deleteUser(userId) {
+            let users = DataManager.getUsers();
+            users = users.filter(user => user.id !== userId);
+            DataManager.saveUsers(users);
+            
+            // Limpa dados associados (opcional, mas recomendado)
+            // Aqui você poderia iterar pelas chaves base e remover os dados do usuário.
+            // Ex: localStorage.removeItem(`user_${userId}_tratamentos_v8`);
+
+            // Se o usuário excluído era o ativo, limpa o usuário ativo
+            if (DataManager.getActiveUserId() === userId) {
+                DataManager.setActiveUserId('');
+            }
+
+            this.renderUserSelector();
+            this.renderUserList();
+            Renderer.renderApp();
+
+            UI.mostrarToast('Paciente excluído.', 'info');
+        },
+
+        renderUserSelector() {
+            const selector = document.getElementById('user-selector');
+            const users = DataManager.getUsers();
+            const activeUserId = DataManager.getActiveUserId();
+            
+            selector.innerHTML = '<option value="">-- Selecione um Paciente --</option>';
+            users.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.textContent = user.name;
+                if (user.id === activeUserId) {
+                    option.selected = true;
+                }
+                selector.appendChild(option);
+            });
+        },
+
+        renderUserList() {
+            const container = document.getElementById('user-list-container');
+            const users = DataManager.getUsers();
+            container.innerHTML = '';
+            
+            if (users.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-500">Nenhum paciente cadastrado.</p>';
+                return;
+            }
+
+            users.forEach(user => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between p-3 bg-gray-100 rounded-lg';
+                div.innerHTML = `
+                    <span class="font-medium">${user.name}</span>
+                    <button class="btn-delete-user text-red-500 hover:text-red-700 text-xl" data-id="${user.id}" title="Excluir Paciente">
+                        &times;
+                    </button>
+                `;
+                container.appendChild(div);
+            });
+        }
+    };
+
+// ========================================
+    // INICIALIZAÇÃO DA APLICAÇÃO
     // ========================================
     document.addEventListener('DOMContentLoaded', () => {
-        // Aplicar modo escuro se necess谩rio
+        // Aplica o modo escuro primeiro, pois é uma configuração global
         UI.aplicarDarkMode();
         
-        // Inicializar gerenciador de tratamentos
-        TreatmentManager.init();
+        // Inicializa o gerenciador de usuários, que popula o seletor
+        UserManager.init();
         
-        // Renderizar interface
+        // Renderiza a aplicação principal, que vai decidir o que mostrar com base no usuário ativo
+        Renderer.renderApp();
+        
+        // Data atual é global
         document.getElementById('current-date').textContent = UI.formatarData(new Date());
-        Renderer.renderDosesDiarias();
-        
-        // Inicializar notifica莽玫es se estiverem ativadas
-        if (DataManager.carregarNotificacoes()) {
+  
+        // Tenta inicializar as notificações. A permissão é por domínio, não por usuário.
+        if (DataManager.carregarNotificacoes()) { // Carrega a config do usuário ativo
             NotificationManager.solicitarPermissao().then(permitido => {
                 if (permitido) {
                     NotificationManager.iniciarVerificacao();
-                }
+           
+     }
             });
         }
         
         // ========================================
-        // EVENT LISTENERS
+        // EVENT LISTENERS GLOBAIS E DE MODAIS
         // ========================================
         
-        // Bot茫o de modo escuro
+        // Botão de modo escuro
         document.getElementById('btn-toggle-dark').addEventListener('click', () => {
-            UI.toggleDarkMode();
-        });
         
-        // Bot茫o de notifica莽玫es
+    UI.toggleDarkMode();
+        });
+
+        // --- Modais de Gerenciamento de Usuário ---
+        document.getElementById('btn-manage-users').addEventListener('click', () => {
+            document.getElementById('user-modal').classList.remove('hidden');
+        });
+        document.getElementById('btn-close-user-modal').addEventListener('click', () => {
+            document.getElementById('user-modal').classList.add('hidden');
+        });
+        document.getElementById('btn-close-user-modal-x').addEventListener('click', () => {
+            document.getElementById('user-modal').classList.add('hidden');
+        });
+
+        
+        // Botão de notificações
         document.getElementById('btn-notifications').addEventListener('click', () => {
+            if (!DataManager.getActiveUserId()) {
+                UI.mostrarToast('Selecione um paciente para configurar as notificações.', 'error');
+                return;
+            }
             document.getElementById('modal-notificacoes').classList.remove('hidden');
             
-            // Atualizar estado do toggle
+            // Atualizar estado do toggle com base no usuário ativo
             const btnToggle = document.getElementById('btn-toggle-notificacoes');
             const ativado = DataManager.carregarNotificacoes();
-            btnToggle.dataset.enabled = ativado.toString();
+          
+  btnToggle.dataset.enabled = ativado.toString();
             
             if (ativado) {
                 btnToggle.classList.remove('bg-gray-300');
                 btnToggle.classList.add('bg-blue-600');
                 btnToggle.querySelector('span').style.transform = 'translateX(24px)';
+            } else {
+                btnToggle.classList.add('bg-gray-300');
+                btnToggle.classList.remove('bg-blue-600');
+                btnToggle.querySelector('span').style.transform = 'translateX(0)';
             }
-            
-            // Atualizar anteced锚ncia
+        
+    
+            // Atualizar antecedência com base no usuário ativo
             document.getElementById('select-antecedencia').value = DataManager.carregarAntecedencia().toString();
         });
-        
-        // Toggle de notifica莽玫es
+// Toggle de notificações
         document.getElementById('btn-toggle-notificacoes').addEventListener('click', async function() {
             const ativado = this.dataset.enabled === 'true';
             
             if (!ativado) {
                 const permitido = await NotificationManager.solicitarPermissao();
                 if (permitido) {
-                    this.dataset.enabled = 'true';
+     
+               this.dataset.enabled = 'true';
                     this.classList.remove('bg-gray-300');
                     this.classList.add('bg-blue-600');
                     this.querySelector('span').style.transform = 'translateX(24px)';
                     DataManager.salvarNotificacoes(true);
-                    NotificationManager.iniciarVerificacao();
-                    UI.mostrarToast('Notifica莽玫es ativadas!', 'success');
+ 
+                   NotificationManager.iniciarVerificacao();
+                    UI.mostrarToast('Notificações ativadas!', 'success');
                 } else {
-                    UI.mostrarToast('Permiss茫o de notifica莽玫es negada', 'error');
+                    UI.mostrarToast('Permissão de notificações negada', 'error');
                 }
-            } else {
+ 
+           } else {
                 this.dataset.enabled = 'false';
                 this.classList.remove('bg-blue-600');
-                this.classList.add('bg-gray-300');
+this.classList.add('bg-gray-300');
                 this.querySelector('span').style.transform = 'translateX(0)';
                 DataManager.salvarNotificacoes(false);
                 NotificationManager.pararVerificacao();
-                UI.mostrarToast('Notifica莽玫es desativadas', 'info');
+                UI.mostrarToast('Notificações desativadas', 'info');
             }
         });
-        
-        // Alterar anteced锚ncia de notifica莽茫o
+// Alterar antecedência de notificação
         document.getElementById('select-antecedencia').addEventListener('change', function() {
             DataManager.salvarAntecedencia(parseInt(this.value));
-            UI.mostrarToast('Anteced锚ncia atualizada', 'info');
+            UI.mostrarToast('Antecedência atualizada', 'info');
         });
-        
-        // Testar notifica莽茫o
+// Testar notificação
         document.getElementById('btn-testar-notificacao').addEventListener('click', () => {
             if (NotificationManager.permissaoAtiva) {
                 NotificationManager.enviarNotificacao(
-                    '馃拪 Teste de Notifica莽茫o',
-                    'Se voc锚 est谩 vendo isso, as notifica莽玫es est茫o funcionando perfeitamente!'
-                );
+                    '💊 Teste de Notificação',
+                    'Se você está vendo isso, as notificações estão funcionando perfeitamente!'
+     
+           );
             } else {
-                UI.mostrarToast('Ative as notifica莽玫es primeiro', 'error');
+                UI.mostrarToast('Ative as notificações primeiro', 'error');
             }
         });
-        
-        // Fechar modal de notifica莽玫es
+// Fechar modal de notificações
         document.getElementById('btn-fechar-notificacoes').addEventListener('click', () => {
             document.getElementById('modal-notificacoes').classList.add('hidden');
         });
-        
-        document.getElementById('btn-close-notificacoes-x').addEventListener('click', () => {
+document.getElementById('btn-close-notificacoes-x').addEventListener('click', () => {
             document.getElementById('modal-notificacoes').classList.add('hidden');
         });
-        
-        // Abrir modal de adicionar tratamento
+// Abrir modal de adicionar tratamento
         document.getElementById('btn-open-modal').addEventListener('click', () => {
             FormManager.limparFormulario();
             document.getElementById('med-modal').classList.remove('hidden');
         });
-        
-        // Fechar modal de tratamento
+// Fechar modal de tratamento
         document.getElementById('btn-cancel-modal').addEventListener('click', () => {
             document.getElementById('med-modal').classList.add('hidden');
         });
-        
-        document.getElementById('btn-close-modal-x').addEventListener('click', () => {
+document.getElementById('btn-close-modal-x').addEventListener('click', () => {
             document.getElementById('med-modal').classList.add('hidden');
         });
-        
-        // Adicionar hor谩rio manualmente
+// Adicionar horário manualmente
         document.getElementById('btn-add-horario').addEventListener('click', () => {
             FormManager.adicionarCampoHorario();
         });
-        
-        // Sugest玫es de hor谩rios
+// Sugestões de horários
         document.querySelectorAll('.btn-sugestao').forEach(btn => {
             btn.addEventListener('click', () => {
                 const intervalo = parseInt(btn.dataset.intervalo);
                 FormManager.preencherHorariosSugestao(intervalo);
             });
         });
-        
-        // Alterar tipo de tratamento
+// Alterar tipo de tratamento
         document.getElementById('tipo-tratamento').addEventListener('change', function() {
             const duracaoContainer = document.getElementById('duracao-container');
             if (this.value === 'continuo') {
                 duracaoContainer.style.display = 'none';
                 document.getElementById('duracao-tratamento').removeAttribute('required');
             } else {
-                duracaoContainer.style.display = 'block';
+       
+         duracaoContainer.style.display = 'block';
                 document.getElementById('duracao-tratamento').setAttribute('required', 'required');
             }
         });
-        
-        // Alterar instru莽玫es
+// Alterar instruções
         document.getElementById('instrucoes-remedio').addEventListener('change', function() {
             const container = document.getElementById('instrucoes-personalizadas-container');
             if (this.value === 'personalizado') {
                 container.classList.remove('hidden');
             } else {
                 container.classList.add('hidden');
-            }
+           
+ }
         });
-        
-        // Submeter formul谩rio
+// Submeter formulário
         document.getElementById('form-remedio').addEventListener('submit', (e) => {
             e.preventDefault();
             
             if (!FormManager.validarFormulario()) {
-                UI.mostrarToast('Por favor, preencha todos os campos obrigat贸rios', 'error');
+                UI.mostrarToast('Por favor, preencha todos os campos obrigatórios', 'error');
                 return;
-            }
+          
+  }
             
             const id = document.getElementById('tratamento-id').value;
             const dados = FormManager.coletarDados();
             
             let sucesso;
             if (id) {
-                sucesso = TreatmentManager.editarTratamento(id, dados);
+                sucesso 
+= TreatmentManager.editarTratamento(id, dados);
             } else {
                 sucesso = TreatmentManager.adicionarTratamento(dados);
             }
             
             if (sucesso) {
                 Renderer.renderDosesDiarias();
-                document.getElementById('med-modal').classList.add('hidden');
+            
+    document.getElementById('med-modal').classList.add('hidden');
             }
         });
-        
-        // Clicar em card de dose
+// Clicar em card de dose
         document.getElementById('checklist-container').addEventListener('click', (e) => {
             const card = e.target.closest('[data-id]');
             if (card) {
                 TreatmentManager.toggleDose(card.dataset.id);
                 Renderer.renderDosesDiarias();
                 
-                // Verificar se todas as doses foram conclu铆das
+       
+         // Verificar se todas as doses foram concluídas
                 if (TreatmentManager.todasDosesConcluidas()) {
                     document.getElementById('modal-conclusao').classList.remove('hidden');
                 }
             }
         });
-        
-        // Fechar modal de conclus茫o
+// Fechar modal de conclusão
         document.getElementById('btn-reset').addEventListener('click', () => {
             document.getElementById('modal-conclusao').classList.add('hidden');
         });
-        
-        // Abrir relat贸rio
+// Abrir relatório
         document.getElementById('btn-open-relatorio').addEventListener('click', () => {
             Renderer.renderRelatorio();
             document.getElementById('relatorio-modal').classList.remove('hidden');
         });
-        
-        // Fechar relat贸rio
+// Fechar relatório
         document.getElementById('btn-fechar-relatorio').addEventListener('click', () => {
             document.getElementById('relatorio-modal').classList.add('hidden');
         });
-        
-        document.getElementById('btn-close-relatorio-x').addEventListener('click', () => {
+document.getElementById('btn-close-relatorio-x').addEventListener('click', () => {
             document.getElementById('relatorio-modal').classList.add('hidden');
         });
-        
-        // Imprimir relat贸rio
+// Imprimir relatório
         document.getElementById('btn-salvar-relatorio').addEventListener('click', () => {
             window.print();
         });
-        
-        // Exportar CSV
+// Exportar CSV
         document.getElementById('btn-exportar-csv').addEventListener('click', () => {
             ExportManager.exportarCSV();
         });
-        
-        // Editar tratamento do relat贸rio
+// Editar tratamento do relatório
         document.getElementById('relatorio-conteudo').addEventListener('click', (e) => {
             const btnEdit = e.target.closest('.btn-edit');
             const btnDelete = e.target.closest('.btn-delete');
             
             if (btnEdit) {
                 const id = btnEdit.dataset.id;
-                FormManager.preencherFormulario(id);
+          
+      FormManager.preencherFormulario(id);
                 document.getElementById('relatorio-modal').classList.add('hidden');
                 document.getElementById('med-modal').classList.remove('hidden');
             }
             
             if (btnDelete) {
                 const id = btnDelete.dataset.id;
-                window.idParaExcluir = id;
+     
+           window.idParaExcluir = id;
                 document.getElementById('modal-confirmar-exclusao').classList.remove('hidden');
             }
         });
-        
-        // Confirmar exclus茫o
+// Confirmar exclusão
         document.getElementById('btn-confirmar-exclusao').addEventListener('click', () => {
             if (window.idParaExcluir) {
                 TreatmentManager.excluirTratamento(window.idParaExcluir);
                 Renderer.renderDosesDiarias();
                 Renderer.renderRelatorio();
                 window.idParaExcluir = null;
-            }
+       
+     }
             document.getElementById('modal-confirmar-exclusao').classList.add('hidden');
         });
-        
-        // Cancelar exclus茫o
+// Cancelar exclusão
         document.getElementById('btn-cancelar-exclusao').addEventListener('click', () => {
             window.idParaExcluir = null;
             document.getElementById('modal-confirmar-exclusao').classList.add('hidden');
         });
-        
-        // Atualizar pr贸xima dose a cada minuto
+// Atualizar próxima dose a cada minuto
         setInterval(() => {
-            Renderer.atualizarProximaDose();
-            NotificationManager.atualizarBadge();
+            if (DataManager.getActiveUserId()) {
+                Renderer.atualizarProximaDose();
+                NotificationManager.atualizarBadge();
+            }
         }, 60000);
-    });
+});
     </script>
 </body>
 </html>
