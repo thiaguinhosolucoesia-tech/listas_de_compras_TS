@@ -125,12 +125,13 @@
     // Edite este objeto para customizar completamente seu diário de bordo.
     // A interface será construída a partir daqui.
     const logbookConfig = {
-        layout: "grid", // "grid" ou "column"
+        layout: "grid", // "grid" para colunas lado a lado, "column" para uma única coluna.
         sections: [
             {
-                id: "planning",
-                title: "Planejamento e Metas",
+                id: "planning", // Identificador único para a seção
+                title: "Planejamento e Metas", // Título que aparecerá no card
                 fields: [
+                    // Cada objeto aqui é um campo no formulário
                     { id: "dailyFocus", label: "Foco Principal do Dia", type: "text", placeholder: "Qual é a tarefa mais importante de hoje?" },
                     { id: "criticalTasks", label: "Tarefas Críticas", type: "textarea", placeholder: "Liste as 3-5 prioridades que exigem sua atenção." }
                 ]
@@ -171,7 +172,7 @@
             showView(view) {
                 document.getElementById('loader-container').style.display = view === 'loader' ? 'block' : 'none';
                 document.getElementById('auth-container').style.display = view === 'auth' ? 'flex' : 'none';
-                document.getElementById('app-container').style.display = view === 'app' ? 'none' : 'block';
+                document.getElementById('app-container').style.display = view === 'app' ? 'block' : 'none';
             },
 
             addAuthListeners() {
