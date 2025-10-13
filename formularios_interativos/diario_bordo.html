@@ -30,10 +30,10 @@
         
         .main-container { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
 
-        /* --- Tela de Autenticação Pendente --- */
-        #auth-container { display: flex; align-items: center; justify-content: center; height: 100%; text-align: center; }
+        /* --- Tela de Acesso Negado --- */
+        #auth-container { display: none; align-items: center; justify-content: center; height: 100%; text-align: center; }
         .auth-box { background: var(--white-color); padding: 40px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
-        .auth-box h1 { color: var(--primary-color); }
+        .auth-box h1 { color: var(--danger-color); }
         .auth-box p { color: var(--gray-color); margin-top: 10px; }
 
         /* --- App Header --- */
@@ -44,6 +44,7 @@
         #logout-btn { background: var(--danger-color); color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: 600; }
 
         /* --- Skeleton Loader --- */
+        #loader-container { display: block; }
         .skeleton { background-color: #e0e0e0; border-radius: 8px; animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
         .skeleton-header { height: 74px; margin-bottom: 20px; }
         .skeleton-nav { height: 40px; width: 300px; margin: 0 auto 25px auto;}
@@ -72,12 +73,12 @@
 <body>
     <div id="auth-container">
         <div class="auth-box">
-            <h1>Aguardando Autenticação</h1>
-            <p>Por favor, faça login em sua plataforma para continuar.</p>
+            <h1>Acesso Negado</h1>
+            <p>Sua sessão é inválida ou expirou. Por favor, retorne à plataforma e faça login novamente.</p>
         </div>
     </div>
 
-    <div id="loader-container" class="main-container" style="display: none;">
+    <div id="loader-container" class="main-container">
         <div class="skeleton skeleton-header"></div>
         <div class="skeleton skeleton-nav"></div>
         <div class="daily-wrapper">
@@ -171,10 +172,12 @@
             addAuthListeners() {
                 auth.onAuthStateChanged(user => {
                     if (user) {
-                        this.showView('loader');
-                        this.currentUser = user;
-                        document.getElementById('user-email').textContent = user.email;
-                        this.loadDayData(this.getDateString(this.displayedDate));
+                        if (!this.currentUser) { // Apenas carrega na primeira vez que o usuário é detectado
+                            this.showView('loader');
+                            this.currentUser = user;
+                            document.getElementById('user-email').textContent = user.email;
+                            this.loadDayData(this.getDateString(this.displayedDate));
+                        }
                     } else {
                         this.currentUser = null;
                         this.showView('auth');
