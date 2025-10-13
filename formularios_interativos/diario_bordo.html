@@ -2,562 +2,326 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diário de Bordo Profissional</title>
-    <meta name="theme-color" content="#0D47A1"/>
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Diário de Bordo Profissional v2.0</title>
     
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <style>
         :root {
-            --primary-color: #1A237E; /* Azul corporativo escuro */
-            --accent-color: #009688; /* Verde/Azul para ações positivas */
-            --light-bg: #F5F7FA; /* Fundo muito claro, quase branco */
-            --text-color: #212121;
-            --border-color: #DDE2E8;
-            --background-color: #ECEFF1; /* Fundo geral cinza azulado */
-            --white: #fff;
-            --success-green: #4CAF50;
-            --warning-amber: #FFC107;
-            --gray: #757575;
-            --info-purple: #673AB7;
-            --header-bg: #E8EAF6; /* Fundo do cabeçalho levemente azulado */
+            --primary-color: #2c3e50; /* Azul Marinho Corporativo */
+            --accent-color: #3498db; /* Azul Brilhante para Ações */
+            --dark-color: #222;
+            --light-color: #f4f6f8; /* Fundo geral */
+            --gray-color: #7f8c8d;
+            --white-color: #ffffff;
+            --success-color: #27ae60;
+            --warning-amber: #f39c12;
+            --border-color: #dfe4ea;
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-headings: 'Lato', var(--font-main);
         }
+        @keyframes pulse { 50% { opacity: .5; } }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: smooth; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--background-color); color: var(--text-color); line-height: 1.6; padding: 15px; }
-        .container { max-width: 1200px; margin: 0 auto; background-color: var(--white); padding: 20px 25px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08); }
-        header { text-align: center; margin-bottom: 25px; background-color: var(--header-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); }
-        header h1 { color: var(--primary-color); font-size: 2.2em; margin-bottom: 10px; }
-        .date-navigation { display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 5px; }
-        .nav-btn { background: none; border: none; font-size: 2.2em; cursor: pointer; color: var(--primary-color); padding: 0 10px; transition: transform 0.2s; }
-        .nav-btn:hover:not(:disabled) { transform: scale(1.1); }
-        .nav-btn:disabled { color: var(--gray); opacity: 0.5; cursor: not-allowed; }
-        #currentDate { font-size: 1.3em; color: var(--primary-color); font-weight: 600; }
+        html, body { height: 100%; }
+        body { font-family: var(--font-main); background-color: var(--light-color); color: var(--dark-color); line-height: 1.6; }
         
-        #actionBank { margin-bottom: 20px; border: 1px solid var(--border-color); border-radius: 8px; background-color: var(--light-bg); }
-        #actionBank summary { background-color: var(--primary-color); color: var(--white); padding: 12px 15px; font-weight: 600; cursor: pointer; border-radius: 8px; transition: background-color 0.2s; }
-        #actionBank summary:hover { background-color: #283593; }
-        #actionBank[open] summary { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
-        .action-bank-content { max-height: 350px; overflow-y: auto; padding: 15px; background-color: var(--light-bg); border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
-        .action-bank-content h4 { color: var(--primary-color); margin-top: 15px; margin-bottom: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; font-size: 1.1em; }
-        .action-item { padding: 10px; margin: 4px 0; border-radius: 6px; cursor: pointer; transition: background-color 0.2s, color 0.2s, transform 0.1s; background-color: var(--white); border: 1px solid var(--border-color); }
-        .action-item:hover { background-color: var(--accent-color); color: var(--white); transform: translateX(5px); box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }
-        
+        /* --- Container Principal --- */
+        .main-container { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
+
+        /* --- Estilos de Login --- */
+        #login-container { display: flex; align-items: center; justify-content: center; height: 100%; padding: 20px; }
+        .login-box { background: var(--white-color); padding: 40px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        .login-box h1 { font-family: var(--font-headings); color: var(--primary-color); margin-bottom: 25px; }
+        .login-box .form-group { margin-bottom: 20px; text-align: left; }
+        .login-box label { display: block; font-weight: 600; margin-bottom: 5px; }
+        .login-box input { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; }
+        .login-box .button-group { display: flex; gap: 10px; margin-top: 25px; }
+        .login-box .btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer; }
+        .btn-primary { background-color: var(--primary-color); color: var(--white-color); }
+        .btn-secondary { background-color: #ecf0f1; color: var(--primary-color); }
+        #login-error { color: #e74c3c; margin-top: 15px; font-size: 0.9em; min-height: 1.2em; }
+
+        /* --- App Header --- */
+        #app-header { background: var(--white-color); padding: 15px 25px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        #app-header h1 { color: var(--primary-color); font-size: 1.8em; margin: 0; }
+        #user-info { display: flex; align-items: center; gap: 15px; }
+        #user-email { color: var(--gray-color); font-size: 0.9em; }
+        #logout-btn { background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+
+        /* --- Skeleton Loader --- */
+        .skeleton { background-color: #e0e0e0; border-radius: 8px; animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        .skeleton-header { height: 60px; margin-bottom: 20px; }
+        .skeleton-box { height: 300px; }
         .daily-wrapper { display: grid; grid-template-columns: 1fr; gap: 30px; }
         @media (min-width: 900px) { .daily-wrapper { grid-template-columns: 1fr 1fr; } }
-        .section-box { border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; transition: all 0.3s ease; background-color: var(--white); }
-        fieldset:disabled { opacity: 0.7; background-color: #F8F9FA; }
+        
+        /* --- Estilos do Diário --- */
+        header { text-align: center; margin-bottom: 25px; }
+        .date-navigation { display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 5px; }
+        .nav-btn { background: none; border: none; font-size: 2.2em; cursor: pointer; color: var(--primary-color); padding: 0 10px; }
+        #currentDate { font-size: 1.3em; color: var(--primary-color); font-weight: 600; }
+        .section-box { border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; background-color: var(--white-color); }
         .section-box h2 { font-size: 1.6em; color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; }
-        #reviewBox h2 { color: var(--info-purple); }
-        .form-section label { display: block; font-weight: 600; margin-bottom: 8px; color: #444; }
-        input[type="text"], input[type="number"], textarea { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 5px; font-size: 1em; background-color: var(--white); transition: border-color 0.2s, box-shadow 0.2s; }
-        input:focus, textarea:focus { border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(26, 35, 126, 0.2); outline: none; }
+        input[type="text"], input[type="number"], textarea { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 5px; font-size: 1em; }
         textarea { min-height: 100px; resize: vertical; }
-        #todo-list li { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; background-color: #F8F8F8; padding: 8px; border-radius: 4px; border: 1px solid #eee; }
-        #todo-list li span { flex-grow: 1; }
-        .button-container { text-align: center; margin-top: 25px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
-        button { background-color: var(--primary-color); color: var(--white); border: none; padding: 12px 25px; border-radius: 8px; font-size: 1.05em; font-weight: 600; cursor: pointer; transition: all 0.3s; }
-        button:disabled { background-color: var(--gray); cursor: not-allowed; transform: none; box-shadow: none; }
-        button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        button.save-btn, button#endDayBtn { background-color: var(--accent-color); }
-        button.save-btn:hover:not(:disabled), button#endDayBtn:hover:not(:disabled) { background-color: #00796B; }
-
-        #nextDayTips, .edit-log { display: none; margin-top: 25px; padding: 15px; background-color: #FFFBEB; border-left: 5px solid var(--warning-amber); border-radius: 0 8px 8px 0; font-size: 0.9em; }
-        .edit-log { background-color: #E3F2FD; border-color: var(--primary-color); color: var(--primary-color); }
-        #weeklySummarySection { display: none; margin-top: 30px; }
-        #weeklySummaryContent { white-space: pre-wrap; font-family: "SF Mono", "Courier New", monospace; line-height: 1.8; background-color: #F5F5F5; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.9em; overflow-x: auto; color: var(--text-color); }
-        footer { text-align: center; margin-top: 40px; color: var(--gray); font-size: 0.9em; padding: 10px; background-color: var(--header-bg); border-radius: 8px; }
-        .kpi-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; align-items: flex-end; margin-bottom: 10px; }
-        .kpi-grid label { margin-bottom: 0; }
+        .button-container { text-align: center; margin-top: 25px; }
+        button#endDayBtn { background-color: var(--accent-color); color: var(--white-color); border: none; padding: 12px 25px; border-radius: 8px; font-size: 1.05em; font-weight: 600; cursor: pointer; }
+        footer { text-align: center; margin-top: 40px; color: var(--gray-color); font-size: 0.9em; }
     </style>
 </head>
 <body>
-    <main class="container">
-        <header>
-            <h1>Diário de Bordo Profissional</h1>
-            <div class="date-navigation">
-                <button id="prevDayBtn" class="nav-btn">&lt;</button>
-                <p id="currentDate"></p>
-                <button id="nextDayBtn" class="nav-btn">&gt;</button>
+    <div id="login-container">
+        <div class="login-box">
+            <h1>Diário de Bordo</h1>
+            <p>Acesse sua conta ou crie uma nova.</p>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" required>
+                </div>
+                <div id="login-error"></div>
+                <div class="button-group">
+                    <button type="button" id="login-btn" class="btn btn-primary">Entrar</button>
+                    <button type="button" id="signup-btn" class="btn btn-secondary">Cadastrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="loader-container" class="main-container" style="display: none;">
+        <div class="skeleton skeleton-header"></div>
+        <div class="daily-wrapper">
+            <div class="skeleton skeleton-box"></div>
+            <div class="skeleton skeleton-box"></div>
+        </div>
+    </div>
+
+    <div id="app-container" class="main-container" style="display: none;">
+        <header id="app-header">
+            <h1>Diário de Bordo</h1>
+            <div id="user-info">
+                <span id="user-email"></span>
+                <button id="logout-btn">Sair</button>
             </div>
         </header>
 
-        <div id="settingsBox" class="section-box" style="margin-bottom: 20px;">
-            <div class="form-section">
-                <label for="userName">Seu Identificador (Nome ou ID - Sensível a maiúsculas/minúsculas)</label>
-                <input type="text" id="userName" placeholder="Usado para salvar e carregar seus dados na nuvem.">
-            </div>
-        </div>
-
-        <details id="actionBank" open>
-            <summary>💡 Banco de Ações Estratégicas (Clique para expandir)</summary>
-            <div class="action-bank-content" id="action-bank-content">
-                <h4>🎯 Estratégia & Metas</h4>
-                <div class="action-item">Revisar os OKRs/metas do trimestre e conectar com uma tarefa de hoje.</div>
-                <div class="action-item">Dedicar 30 min de 'deep work' na tarefa mais importante do projeto X.</div>
-                <div class="action-item">Analisar um relatório de performance e extrair um insight acionável.</div>
-                <div class="action-item">Fazer um brainstorming de 15 min para resolver um obstáculo específico.</div>
-                <div class="action-item">Mapear os próximos passos de um projeto estratégico.</div>
-
-                <h4>📈 Comercial & Marketing</h4>
-                <div class="action-item">Fazer follow-up com 3 leads/clientes estratégicos.</div>
-                <div class="action-item">Planejar um post/conteúdo para redes sociais ou blog da empresa.</div>
-                <div class="action-item">Analisar a performance da última campanha de marketing.</div>
-                <div class="action-item">Pedir um depoimento ou feedback de um cliente satisfeito.</div>
-                <div class="action-item">Pesquisar um concorrente e identificar uma oportunidade.</div>
-
-                <h4>👥 Liderança & Equipe</h4>
-                <div class="action-item">Dar um feedback construtivo e específico para um membro da equipe.</div>
-                <div class="action-item">Reconhecer publicamente (em reunião ou chat) uma boa entrega da equipe.</div>
-                <div class="action-item">Fazer um 'check-in' individual de 10 min com um liderado.</div>
-                <div class="action-item">Delegar uma tarefa com clareza, explicando o 'porquê'.</div>
-                <div class="action-item">Revisar e otimizar a distribuição de tarefas da equipe para a semana.</div>
-
-                <h4>🤝 Comunicação & Stakeholders</h4>
-                <div class="action-item">Enviar um e-mail de alinhamento para as partes interessadas de um projeto.</div>
-                <div class="action-item">Agendar uma conversa difícil que está sendo adiada.</div>
-                <div class="action-item">Preparar a pauta para a próxima reunião importante.</div>
-                <div class="action-item">Agradecer um colega de outro departamento pela ajuda.</div>
-                <div class="action-item">Fazer um follow-up com um stakeholder 'apenas para manter o relacionamento'.</div>
-
-                <h4>⚙️ Processos & Operações</h4>
-                <div class="action-item">Mapear e identificar um gargalo em um processo recorrente.</div>
-                <div class="action-item">Dedicar 15 minutos para organizar sua área de trabalho (física ou digital).</div>
-                <div class="action-item">Automatizar ou criar um template para uma tarefa repetitiva.</div>
-                <div class="action-item">Revisar o fluxo de caixa ou o orçamento de um projeto.</div>
-                <div class="action-item">Implementar um checklist para um processo crítico para garantir a qualidade.</div>
-            </div>
-        </details>
-
-        <div class="daily-wrapper">
-            <div id="planningBox" class="section-box">
-                <h2>Planejamento do Dia</h2>
-                <form id="planningForm">
-                    <fieldset id="planningFieldset">
+        <main>
+            <header>
+                <div class="date-navigation">
+                    <button id="prevDayBtn" class="nav-btn">&lt;</button>
+                    <p id="currentDate"></p>
+                    <button id="nextDayBtn" class="nav-btn">&gt;</button>
+                </div>
+            </header>
+            
+            <div class="daily-wrapper">
+                <div id="planningBox" class="section-box">
+                    <h2>Planejamento do Dia</h2>
+                    <form id="planningForm">
                         <div class="form-section"><label for="dailyFocus">Foco Principal do Dia</label><input type="text" id="dailyFocus" placeholder="Ex: Avançar 20% no relatório de vendas trimestral."></div>
-                        <div class="form-section"><label for="criticalTasks">Prioridades (Exigem sua atuação direta)</label><textarea id="criticalTasks" rows="3" placeholder="Ex: Alinhar escopo do projeto Y com o Diretor."></textarea></div>
-                        <div class="form-section"><label>A Realizar (To-Do)</label>
-                            <ul id="todo-list" style="list-style-type: none; padding-left: 0;"></ul>
-                            <div style="display:flex; gap: 5px; margin-top: 10px;"><input type="text" id="new-todo-input" placeholder="Nova tarefa..."><button type="button" id="add-todo-btn" style="padding: 0 15px;">+</button></div>
-                        </div>
-                        <div style="display: grid; gap: 20px; grid-template-columns: 1fr 1fr;">
-                           <div><label for="doing">Em Andamento</label><textarea id="doing" placeholder="Ex: Analisando dados..."></textarea></div>
-                           <div><label for="delegated">Delegado</label><textarea id="delegated" placeholder="Ex: Relatório inicial para [Nome]..."></textarea></div>
-                        </div>
-                    </fieldset>
-                </form>
-            </div>
-            <div id="reviewBox" class="section-box">
-                <h2>Revisão e Fechamento do Dia</h2>
-                <form id="reviewForm">
-                     <fieldset id="reviewFieldset">
+                         <div class="form-section"><label for="criticalTasks">Prioridades (Sua atuação direta)</label><textarea id="criticalTasks" rows="3" placeholder="Ex: Alinhar escopo do projeto Y com o Diretor."></textarea></div>
+                    </form>
+                </div>
+                <div id="reviewBox" class="section-box">
+                    <h2>Revisão e Fechamento do Dia</h2>
+                    <form id="reviewForm">
                         <div class="form-section"><label for="mainAchievement">Principal Conquista</label><input type="text" id="mainAchievement" placeholder="Qual foi o maior avanço de hoje?"></div>
                         <div class="form-section"><label for="mainChallenge">Principal Desafio/Aprendizado</label><input type="text" id="mainChallenge" placeholder="O que te bloqueou ou o que você aprendeu?"></div>
-                        <div class="form-section"><label for="uncompletedTasks">O que não foi concluído e por quê?</label><textarea id="uncompletedTasks" rows="2" placeholder="Ex: Faltou informação do setor X."></textarea></div>
-                        <div class="form-section"><label>Métricas do Dia</label>
-                            <div class="kpi-grid">
-                                <label for="kpi1Name">Nome do KPI 1</label><label for="kpi1Value">Valor</label>
-                                <input type="text" id="kpi1Name" placeholder="Ex: Vendas"><input type="number" id="kpi1Value" value="0">
-                            </div>
-                            <div class="kpi-grid">
-                                <label for="kpi2Name">Nome do KPI 2</label><label for="kpi2Value">Valor</label>
-                                <input type="text" id="kpi2Name" placeholder="Ex: Leads Gerados"><input type="number" id="kpi2Value" value="0">
-                            </div>
-                             <div style="margin-top: 15px;">
-                                 <label for="energyLevel">Nível de Energia (1-5)</label>
-                                 <input type="number" id="energyLevel" min="1" max="5" style="width: 100px;">
-                            </div>
-                        </div>
-                    </fieldset>
-                </form>
-                <div class="button-container">
-                    <button type="button" id="editDayBtn">Editar Dia</button>
-                    <button type="button" id="endDayBtn">Analisar e Finalizar Dia</button>
+                    </form>
+                    <div class="button-container">
+                        <button type="button" id="endDayBtn">Salvar e Finalizar Dia</button>
+                    </div>
                 </div>
-                <div id="nextDayTips"><h3>💡 Assistente de Performance para Amanhã</h3><p id="tipContent"></p></div>
-                <div class="edit-log" id="editLog"></div>
             </div>
-        </div>
-        <div class="button-container" style="margin-top: 40px;"><button type="button" id="showWeeklySummaryBtn">Gerar Painel de Controle da Semana</button></div>
-        <section id="weeklySummarySection"><h2 style="text-align:center; color: var(--primary-color); margin-bottom: 20px;">Painel de Controle da Semana</h2><pre id="weeklySummaryContent"></pre></section>
-    </main>
-    <footer><p>Desenvolvido com 🤖 por thIAguinho Soluções</p></footer>
+        </main>
+        
+        <footer><p>Desenvolvido com 🤖 por thIAguinho Soluções</p></footer>
+    </div>
 
     <script>
-        // --- INÍCIO DA CONFIGURAÇÃO FIREBASE ---
-        // SUBSTITUA ESTES VALORES PELOS DO SEU PROJETO FIREBASE
-        const firebaseConfig = {
-            apiKey: "AIzaSyAo9iVQm_BzmvNLAUxc4pGL_qp6ic4JQfo",
-            authDomain: "listas-de-compras-ff4a3.firebaseapp.com",
-            databaseURL: "https://listas-de-compras-ff4a3-default-rtdb.firebaseio.com",
-            projectId: "listas-de-compras-ff4a3",
-            storageBucket: "listas-de-compras-ff4a3.firebasestorage.app",
-            messagingSenderId: "623752672529",
-            appId: "1:623752672529:web:ba43bfdad31f050da3c8b0"
-        };
-        // --- FIM DA CONFIGURAÇÃO FIREBASE ---
+    // --- INÍCIO DA CONFIGURAÇÃO FIREBASE ---
+    // SUBSTITUA ESTES VALORES PELOS DO SEU PROJETO FIREBASE
+    const firebaseConfig = {
+        apiKey: "AIzaSyAo9iVQm_BzmvNLAUxc4pGL_qp6ic4JQfo",
+        authDomain: "listas-de-compras-ff4a3.firebaseapp.com",
+        databaseURL: "https://listas-de-compras-ff4a3-default-rtdb.firebaseio.com",
+        projectId: "listas-de-compras-ff4a3",
+        storageBucket: "listas-de-compras-ff4a3.firebasestorage.app",
+        messagingSenderId: "623752672529",
+        appId: "1:623752672529:web:ba43bfdad31f050da3c8b0"
+    };
+    // --- FIM DA CONFIGURAÇÃO FIREBASE ---
 
-        // Inicializa o Firebase
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const database = firebase.database();
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const App = {
-                data: {},
-                userName: '',
-                displayedDate: new Date(),
-                today: new Date(),
-                isEditing: false,
+    document.addEventListener('DOMContentLoaded', () => {
+        const loginContainer = document.getElementById('login-container');
+        const appContainer = document.getElementById('app-container');
+        const loaderContainer = document.getElementById('loader-container');
+        
+        const loginBtn = document.getElementById('login-btn');
+        const signupBtn = document.getElementById('signup-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const loginError = document.getElementById('login-error');
 
-                init() {
-                    this.today.setHours(0, 0, 0, 0);
-                    this.displayedDate.setHours(0, 0, 0, 0);
-                    this.loadUserName();
-                    this.addEventListeners();
-                    // Renderiza o dia apenas depois de carregar o nome de usuário
-                    if (this.userName) {
+        const App = {
+            data: {},
+            currentUser: null,
+            displayedDate: new Date(),
+            today: new Date(),
+
+            init() {
+                this.today.setHours(0, 0, 0, 0);
+                this.displayedDate.setHours(0, 0, 0, 0);
+                this.addAuthListeners();
+                this.addEventListeners();
+            },
+
+            showLoader() {
+                loginContainer.style.display = 'none';
+                appContainer.style.display = 'none';
+                loaderContainer.style.display = 'block';
+            },
+
+            hideLoader() {
+                loaderContainer.style.display = 'none';
+            },
+
+            addAuthListeners() {
+                auth.onAuthStateChanged(user => {
+                    this.showLoader();
+                    if (user) {
+                        this.currentUser = user;
+                        document.getElementById('user-email').textContent = user.email;
+                        this.hideLoader();
+                        loginContainer.style.display = 'none';
+                        appContainer.style.display = 'block';
                         this.loadDayData(this.getDateString(this.displayedDate));
                     } else {
-                        this.renderDay(this.getDateString(this.displayedDate));
+                        this.currentUser = null;
+                        this.hideLoader();
+                        appContainer.style.display = 'none';
+                        loginContainer.style.display = 'flex';
                     }
-                },
+                });
 
-                getDateString: date => date.toISOString().split('T')[0],
+                loginBtn.addEventListener('click', () => {
+                    const email = document.getElementById('email').value;
+                    const password = document.getElementById('password').value;
+                    auth.signInWithEmailAndPassword(email, password)
+                        .catch(error => loginError.textContent = this.getFriendlyAuthError(error.code));
+                });
 
-                loadUserName() {
-                    this.userName = localStorage.getItem('professionalLogUserName') || '';
-                    document.getElementById('userName').value = this.userName;
-                },
+                signupBtn.addEventListener('click', () => {
+                    const email = document.getElementById('email').value;
+                    const password = document.getElementById('password').value;
+                    auth.createUserWithEmailAndPassword(email, password)
+                        .catch(error => loginError.textContent = this.getFriendlyAuthError(error.code));
+                });
 
-                saveUserName() {
-                    const newUserName = document.getElementById('userName').value.trim();
-                    if (newUserName !== this.userName) {
-                        this.userName = newUserName;
-                        localStorage.setItem('professionalLogUserName', this.userName);
-                        // Recarrega os dados para o novo usuário
-                        this.loadDayData(this.getDateString(this.displayedDate));
-                    }
-                },
-                
-                async loadDayData(dateString) {
-                    if (!this.userName) {
-                        console.log("Nome de usuário não definido. Abortando carregamento de dados.");
-                        this.data[dateString] = null; // Limpa dados se o usuário for apagado
-                        this.renderDay(dateString);
-                        return;
-                    }
-                    const dataRef = database.ref(`diario-de-bordo/${this.userName}/${dateString}`);
-                    try {
-                        const snapshot = await dataRef.once('value');
-                        this.data[dateString] = snapshot.val();
-                        this.renderDay(dateString);
-                    } catch (error) {
-                        console.error("Erro ao carregar dados do Firebase:", error);
-                        alert("Não foi possível carregar os dados. Verifique a conexão e a configuração do Firebase.");
-                    }
-                },
-
-                renderDay(dateString) {
-                    document.getElementById('currentDate').textContent = this.displayedDate.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-                    document.getElementById('nextDayBtn').disabled = this.getDateString(this.displayedDate) === this.getDateString(this.today);
-                    document.getElementById('planningForm').reset();
-                    document.getElementById('reviewForm').reset();
-                    document.getElementById('todo-list').innerHTML = '';
-                    document.getElementById('nextDayTips').style.display = 'none';
-                    document.getElementById('editLog').style.display = 'none';
-
-                    const dayData = this.data[dateString];
-                    this.isEditing = false;
-                    
-                    if (!dayData || !dayData.review) {
-                        this.isEditing = true;
-                        document.getElementById('editDayBtn').style.display = 'none';
-                        document.getElementById('endDayBtn').style.display = 'block';
-                        document.getElementById('endDayBtn').textContent = 'Analisar e Finalizar Dia';
-                    } else {
-                        document.getElementById('editDayBtn').style.display = 'block';
-                        document.getElementById('editDayBtn').textContent = 'Editar Dia';
-                        document.getElementById('endDayBtn').style.display = 'none';
-                    }
-                    
-                    this.toggleFieldsDisabled(!this.isEditing);
-                    if (!dayData) return;
-
-                    const plan = dayData.plan || {};
-                    document.getElementById('dailyFocus').value = plan.dailyFocus || '';
-                    document.getElementById('criticalTasks').value = plan.criticalTasks || '';
-                    document.getElementById('doing').value = plan.doing || '';
-                    document.getElementById('delegated').value = plan.delegated || '';
-                    
-                    (plan.todo || []).forEach(task => this.createTodoElement(task));
-                    
-                    if (dayData.review) {
-                        const review = dayData.review || {};
-                        Object.keys(review).forEach(key => { const el = document.getElementById(key); if (el) el.value = review[key]; });
-                        this.generateTips(dayData);
-                    }
-
-                    if (dayData.log && dayData.log.length > 0) {
-                        const lastEdit = dayData.log[dayData.log.length - 1];
-                        const editDate = new Date(lastEdit.timestamp).toLocaleString('pt-BR');
-                        document.getElementById('editLog').textContent = `Última edição em ${editDate}.`;
-                        document.getElementById('editLog').style.display = 'block';
-                    }
-                },
-
-                toggleFieldsDisabled(isDisabled) {
-                    document.getElementById('planningFieldset').disabled = isDisabled;
-                    document.getElementById('reviewFieldset').disabled = isDisabled;
-                },
-
-                async toggleEditMode() {
-                    const dateString = this.getDateString(this.displayedDate);
-                    const dayData = this.data[dateString];
-                    if (!dayData || !dayData.review) return;
-
-                    this.isEditing = !this.isEditing;
-                    this.toggleFieldsDisabled(!this.isEditing);
-
-                    const editBtn = document.getElementById('editDayBtn');
-                    if (this.isEditing) {
-                        editBtn.textContent = 'Salvar Alterações';
-                        editBtn.classList.add('save-btn');
-                    } else {
-                        editBtn.textContent = 'Editar Dia';
-                        editBtn.classList.remove('save-btn');
-                        await this.saveCurrentState(true); // torna assíncrono
-                        this.loadDayData(dateString); // Recarrega do firebase para garantir consistência
-                    }
-                },
-                
-                addEventListeners() {
-                    document.getElementById('userName').addEventListener('change', () => this.saveUserName());
-                    document.getElementById('endDayBtn').addEventListener('click', () => this.endDay());
-                    document.getElementById('editDayBtn').addEventListener('click', () => this.toggleEditMode());
-                    document.getElementById('showWeeklySummaryBtn').addEventListener('click', () => this.showWeeklySummary());
-                    document.getElementById('prevDayBtn').addEventListener('click', () => this.navigateDays(-1));
-                    document.getElementById('nextDayBtn').addEventListener('click', () => this.navigateDays(1));
-                    document.getElementById('add-todo-btn').addEventListener('click', () => this.addTodoItem());
-                    document.getElementById('new-todo-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); this.addTodoItem(); }});
-                    document.getElementById('action-bank-content').addEventListener('click', (e) => {
-                        if (e.target.classList.contains('action-item')) {
-                            this.addTodoItem(e.target.textContent);
-                        }
-                    });
-                },
-
-                navigateDays(direction) {
-                    this.displayedDate.setDate(this.displayedDate.getDate() + direction);
-                    this.loadDayData(this.getDateString(this.displayedDate));
-                },
-
-                addTodoItem(predefinedText = null) {
-                    const input = document.getElementById('new-todo-input');
-                    const text = predefinedText || input.value.trim();
-                    if (text) {
-                        this.createTodoElement({ text, deferred: false });
-                        input.value = '';
-                    }
-                },
-                
-                createTodoElement(task) {
-                    const li = document.createElement('li');
-                    li.innerHTML = `<span>${task.text}</span> <label style="font-weight:normal; font-size: 0.9em;"><input type="checkbox" class="defer-checkbox" ${task.deferred ? 'checked' : ''}> Adiar</label>`;
-                    document.getElementById('todo-list').appendChild(li);
-                },
-                
-                async saveCurrentState(isEdit = false) {
-                     const dateString = this.getDateString(this.displayedDate);
-                     if (!this.userName) {
-                         alert("Por favor, preencha seu Identificador para salvar seus registros na nuvem.");
-                         document.getElementById('userName').focus();
-                         return false;
-                     }
-
-                     const todoItems = Array.from(document.querySelectorAll('#todo-list li')).map(li => ({
-                        text: li.querySelector('span').textContent,
-                        deferred: li.querySelector('.defer-checkbox').checked
-                    }));
-
-                    const plan = { dailyFocus: document.getElementById('dailyFocus').value.trim(), criticalTasks: document.getElementById('criticalTasks').value.trim(), todo: todoItems, doing: document.getElementById('doing').value.trim(), delegated: document.getElementById('delegated').value.trim() };
-                    const review = { mainAchievement: document.getElementById('mainAchievement').value.trim(), mainChallenge: document.getElementById('mainChallenge').value.trim(), uncompletedTasks: document.getElementById('uncompletedTasks').value.trim(), energyLevel: document.getElementById('energyLevel').value, kpi1Name: document.getElementById('kpi1Name').value.trim(), kpi1Value: document.getElementById('kpi1Value').value, kpi2Name: document.getElementById('kpi2Name').value.trim(), kpi2Value: document.getElementById('kpi2Value').value };
-                    
-                    let dayData = this.data[dateString] || { log: [] };
-                    dayData.plan = plan;
-                    if(review.mainAchievement || review.energyLevel > 0) { dayData.review = review; }
-                    
-                    if (isEdit) {
-                        if(!dayData.log) dayData.log = [];
-                        dayData.log.push({ timestamp: new Date().toISOString() });
-                    }
-                    
-                    try {
-                        const dataRef = database.ref(`diario-de-bordo/${this.userName}/${dateString}`);
-                        await dataRef.set(dayData);
-                        console.log('Estado salvo no Firebase às', new Date().toLocaleTimeString());
-                        this.data[dateString] = dayData; // Atualiza o estado local
-                        return true;
-                    } catch (error) {
-                        console.error("Erro ao salvar no Firebase:", error);
-                        alert("Não foi possível salvar os dados. Verifique sua conexão.");
-                        return false;
-                    }
-                },
-
-                async endDay() {
-                    if (!document.getElementById('mainAchievement').value || !document.getElementById('energyLevel').value) {
-                        alert('Por favor, preencha a Conquista do Dia e seu Nível de Energia para finalizar.'); return;
-                    }
-                    if (!(await this.saveCurrentState(true))) return;
-
-                    if (confirm('Tem certeza que deseja finalizar e analisar o dia? Tarefas adiadas serão movidas para amanhã.')) {
-                        const dateString = this.getDateString(this.displayedDate);
-                        const dayData = this.data[dateString];
-                        const deferredTasks = dayData.plan.todo.filter(t => t.deferred);
-                        
-                        if (deferredTasks.length > 0) {
-                            const nextDay = new Date(this.displayedDate); nextDay.setDate(nextDay.getDate() + 1);
-                            const nextDayString = this.getDateString(nextDay);
-                            
-                            // Busca os dados do dia seguinte antes de sobrescrever
-                            const nextDayRef = database.ref(`diario-de-bordo/${this.userName}/${nextDayString}`);
-                            const snapshot = await nextDayRef.once('value');
-                            const nextDayData = snapshot.val() || { plan: { todo: [] }, log: [] };
-
-                            if (!nextDayData.plan.todo) nextDayData.plan.todo = [];
-                            const newTasks = deferredTasks.map(task => ({ text: `[ADIADO] ${task.text}`, deferred: false }));
-                            nextDayData.plan.todo = [...newTasks, ...nextDayData.plan.todo];
-                            
-                            await nextDayRef.set(nextDayData); // Salva o dia seguinte atualizado
-                        }
-                        
-                        this.loadDayData(dateString); // Recarrega o dia atual para mostrar o estado finalizado
-                        alert('Dia finalizado e analisado! Insights gerados e tarefas adiadas.');
-                    }
-                },
-                
-                async showWeeklySummary() {
-                    if (!this.userName) {
-                        alert("Por favor, preencha seu Identificador para gerar o relatório.");
-                        return;
-                    }
-
-                    const summarySection = document.getElementById('weeklySummarySection');
-                    summarySection.style.display = 'block';
-                    
-                    const today = new Date(this.displayedDate); today.setHours(0, 0, 0, 0);
-                    const dayOfWeek = today.getDay();
-                    const offsetToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-                    const firstDayOfWeek = new Date(today); firstDayOfWeek.setDate(today.getDate() + offsetToMonday);
-                    const lastDayOfWeek = new Date(firstDayOfWeek); lastDayOfWeek.setDate(firstDayOfWeek.getDate() + 6);
-
-                    let summaryText = `PAINEL DE CONTROLE SEMANAL\nSemana de ${firstDayOfWeek.toLocaleDateString('pt-BR')} a ${lastDayOfWeek.toLocaleDateString('pt-BR')}\n================================================\n\n`;
-                    let daysData = [];
-                    let promises = [];
-
-                    for (let i = 0; i < 7; i++) {
-                        const date = new Date(firstDayOfWeek); date.setDate(date.getDate() + i);
-                        const dateString = this.getDateString(date);
-                        const dataRef = database.ref(`diario-de-bordo/${this.userName}/${dateString}`);
-                        promises.push(dataRef.once('value').then(snapshot => ({ date, data: snapshot.val() })));
-                    }
-
-                    const results = await Promise.all(promises);
-
-                    for (const result of results) {
-                        if (result.data && result.data.review && result.data.review.energyLevel) {
-                            daysData.push(result);
-                            const dayLabel = result.date.toLocaleDateString('pt-BR', {weekday: 'long', day: '2-digit', month: '2-digit'});
-                            summaryText += `--- ${dayLabel.toUpperCase()} ---\n`;
-                            summaryText += `  Foco: ${result.data.plan.dailyFocus || 'Não definido'}\n`;
-                            summaryText += `  Conquista: ${result.data.review.mainAchievement || 'Não registrada'}\n`;
-                            summaryText += `  Desafio: ${result.data.review.mainChallenge || 'Não registrado'}\n\n`;
-                        }
-                    }
-
-                    if(daysData.length === 0) {
-                        summaryText += "Nenhum dia foi finalizado e analisado nesta semana. Preencha seus dias para um resumo poderoso!";
-                    } else {
-                        summaryText += this.generateProfessionalAnalysis(daysData);
-                    }
-                    
-                    document.getElementById('weeklySummaryContent').textContent = summaryText;
-                    summarySection.scrollIntoView({ behavior: 'smooth' });
-                },
-
-                generateProfessionalAnalysis(daysData) {
-                    let analysis = "--- ANÁLISE DE PERFORMANCE DA SEMANA ---\n";
-                    const totalDays = daysData.length;
-                    const avgEnergy = daysData.reduce((sum, d) => sum + (parseInt(d.data.review.energyLevel, 10) || 0), 0) / totalDays;
-
-                    analysis += `  Diagnóstico Geral:\n`;
-                    analysis += `    - Nível médio de energia: ${avgEnergy.toFixed(1)}/5.0\n\n`;
-
-                    // Análise de KPIs
-                    const kpis = {};
-                    daysData.forEach(d => {
-                        const r = d.data.review;
-                        if (r.kpi1Name && r.kpi1Value) {
-                            if (!kpis[r.kpi1Name]) kpis[r.kpi1Name] = 0;
-                            kpis[r.kpi1Name] += parseFloat(r.kpi1Value) || 0;
-                        }
-                        if (r.kpi2Name && r.kpi2Value) {
-                            if (!kpis[r.kpi2Name]) kpis[r.kpi2Name] = 0;
-                            kpis[r.kpi2Name] += parseFloat(r.kpi2Value) || 0;
-                        }
-                    });
-                    
-                    if (Object.keys(kpis).length > 0) {
-                        analysis += `  Totalizadores de KPIs da Semana:\n`;
-                        for (const key in kpis) {
-                            analysis += `    - ${key}: ${kpis[key]}\n`;
-                        }
-                        analysis += `\n`;
-                    }
-                    
-                    analysis += `  Recomendações Estratégicas:\n`;
-
-                    if (avgEnergy < 2.5) {
-                        analysis += `    - GESTÃO DE ENERGIA: Seu nível de energia esteve consistentemente baixo. Isso é um risco para a sustentabilidade da performance. Para a próxima semana, identifique UMA tarefa operacional que possa ser delegada ou automatizada. Proteger sua energia é uma atividade estratégica.\n`;
-                    } else if (avgEnergy >= 4.0) {
-                        analysis += `    - ENERGIA EM ALTA: Seu nível de energia foi elevado! Como você pode replicar as condições (tipo de tarefa, ambiente, colaborações) que levaram a isso? Compartilhe essa energia com a equipe para impulsionar a produtividade geral.\n`;
-                    } else {
-                        analysis += `    - ENERGIA ESTÁVEL: Seu nível de energia está equilibrado. Mantenha as boas práticas de gestão de tempo e priorização. Identifique se algum desafio recorrente pode ser mitigado para elevar ainda mais sua performance.\n`;
-                    }
-                    
-                    return analysis;
-                },
-                
-                generateTips(dayData) {
-                    let tips = [];
-                    const { plan, review } = dayData;
-                    if (plan.dailyFocus && review.mainAchievement && !review.mainAchievement.toLowerCase().includes(plan.dailyFocus.toLowerCase().slice(0, 10))) {
-                        tips.push("INSIGHT DE FOCO: Sua principal conquista pareceu diferente do foco que você definiu. Isso pode indicar que urgências desviaram sua energia. Avalie se o foco de amanhã precisa ser mais protegido e se o planejamento foi realista.");
-                    }
-                    if (review.uncompletedTasks) {
-                        tips.push(`PENDÊNCIAS: Você mencionou tarefas não concluídas: "${review.uncompletedTasks}". Avalie se alguma delas deve ser a **primeira prioridade** de amanhã para evitar o efeito "bola de neve" ou se podem ser delegadas.`);
-                    }
-                    if (review.energyLevel <= 2) {
-                        tips.push(`ENERGIA: Seu nível de energia foi baixo hoje. A consistência vence a intensidade. Garanta uma pausa revigorante de 10 minutos amanhã, longe das telas. Sua performance sustentável é o maior ativo.`);
-                    } else if (review.energyLevel >= 4) {
-                        tips.push(`ALAVANCAGEM DA ENERGIA: Seu nível de energia esteve alto! Qual foi o fator principal? Pense em como replicar essa condição e como usar essa energia positiva para motivar a equipe amanhã. Celebre as pequenas vitórias!`);
-                    }
-                    if (review.mainAchievement) {
-                        tips.push(`IMPACTO: Sua principal conquista foi "${review.mainAchievement}". Como você pode comunicar este sucesso (para sua liderança, equipe, stakeholders) para gerar um impacto ainda maior amanhã?`);
-                    }
-                    const tipsContainer = document.getElementById('nextDayTips');
-                    document.getElementById('tipContent').textContent = tips.length > 0 ? tips.join('\n\n') : 'Dia produtivo! Mantenha o foco e a consistência. Ótimo trabalho!';
-                    tipsContainer.style.display = 'block';
-                },
-            };
-
-            App.init();
+                logoutBtn.addEventListener('click', () => auth.signOut());
+            },
             
-        });
+            getFriendlyAuthError(code) {
+                switch (code) {
+                    case 'auth/wrong-password': return 'Senha incorreta. Tente novamente.';
+                    case 'auth/user-not-found': return 'Nenhum usuário encontrado com este email.';
+                    case 'auth/invalid-email': return 'O formato do email é inválido.';
+                    case 'auth/weak-password': return 'A senha deve ter pelo menos 6 caracteres.';
+                    case 'auth/email-already-in-use': return 'Este email já está cadastrado.';
+                    default: return 'Ocorreu um erro. Tente novamente.';
+                }
+            },
+
+            getDateString: date => date.toISOString().split('T')[0],
+
+            async loadDayData(dateString) {
+                if (!this.currentUser) return;
+                this.showLoader();
+                const dataRef = database.ref(`diario-de-bordo/${this.currentUser.uid}/${dateString}`);
+                try {
+                    const snapshot = await dataRef.once('value');
+                    this.data[dateString] = snapshot.val();
+                    this.renderDay(dateString);
+                } catch (error) {
+                    console.error("Erro ao carregar dados do Firebase:", error);
+                    alert("Não foi possível carregar os dados.");
+                } finally {
+                   this.hideLoader();
+                   appContainer.style.display = 'block'; // Garante que o app seja exibido
+                }
+            },
+
+            renderDay(dateString) {
+                document.getElementById('currentDate').textContent = this.displayedDate.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+                document.getElementById('nextDayBtn').disabled = this.getDateString(this.displayedDate) === this.getDateString(this.today);
+                
+                const dayData = this.data[dateString];
+                
+                document.getElementById('dailyFocus').value = dayData?.plan?.dailyFocus || '';
+                document.getElementById('criticalTasks').value = dayData?.plan?.criticalTasks || '';
+                document.getElementById('mainAchievement').value = dayData?.review?.mainAchievement || '';
+                document.getElementById('mainChallenge').value = dayData?.review?.mainChallenge || '';
+            },
+            
+            addEventListeners() {
+                document.getElementById('endDayBtn').addEventListener('click', () => this.saveCurrentState());
+                document.getElementById('prevDayBtn').addEventListener('click', () => this.navigateDays(-1));
+                document.getElementById('nextDayBtn').addEventListener('click', () => this.navigateDays(1));
+            },
+
+            navigateDays(direction) {
+                this.displayedDate.setDate(this.displayedDate.getDate() + direction);
+                this.loadDayData(this.getDateString(this.displayedDate));
+            },
+
+            async saveCurrentState() {
+                const dateString = this.getDateString(this.displayedDate);
+                if (!this.currentUser) {
+                    alert("Você precisa estar logado para salvar.");
+                    return false;
+                }
+
+                const plan = {
+                    dailyFocus: document.getElementById('dailyFocus').value.trim(),
+                    criticalTasks: document.getElementById('criticalTasks').value.trim(),
+                };
+                const review = {
+                    mainAchievement: document.getElementById('mainAchievement').value.trim(),
+                    mainChallenge: document.getElementById('mainChallenge').value.trim(),
+                };
+                
+                const dayData = {
+                    plan,
+                    review,
+                    lastUpdated: new Date().toISOString()
+                };
+                
+                try {
+                    const dataRef = database.ref(`diario-de-bordo/${this.currentUser.uid}/${dateString}`);
+                    await dataRef.set(dayData);
+                    alert('Dia salvo com sucesso!');
+                    this.data[dateString] = dayData;
+                    return true;
+                } catch (error) {
+                    console.error("Erro ao salvar no Firebase:", error);
+                    alert("Não foi possível salvar os dados.");
+                    return false;
+                }
+            },
+        };
+
+        App.init();
+    });
     </script>
 </body>
 </html>
