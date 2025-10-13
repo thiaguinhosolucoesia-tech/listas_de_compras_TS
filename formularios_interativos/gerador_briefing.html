@@ -1,332 +1,335 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Briefing Oráculo V4: Painel de Comando</title>
+    <title>Painel de Inteligência & Estruturação</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         :root {
-            --primary-color: #c5a47e;
-            --dark-color: #121212;
-            --light-color: #f9f9f9;
-            --gray-color: #666;
+            --primary-color: #34495e; /* Azul corporativo sóbrio */
+            --accent-color: #1abc9c; /* Verde para ações */
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --gray-color: #7f8c8d;
             --white-color: #ffffff;
-            --success-color: #28a745;
-            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            --font-headings: 'Playfair Display', serif;
+            --success-color: #27ae60;
+            --font-main: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            --font-headings: 'Lato', serif;
         }
-
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');
-
+        @import url('https://fonts.googleapis.com/css2?family=Lato:wght@700&family=Roboto:wght@400;500;700&display=swap');
         *, *::before, *::after { box-sizing: border-box; }
-
-        body {
-            font-family: var(--font-main);
-            margin: 0;
-            padding: 0;
-            background-color: var(--light-color);
-            color: var(--dark-color);
-        }
-
-        .container { max-width: 800px; margin: 0 auto; background-color: var(--white-color); }
-
-        .header {
-            background: var(--dark-color); color: var(--white-color);
-            padding: 25px 30px; text-align: center;
-        }
-        .header h1 {
-            font-family: var(--font-headings); margin: 0;
-            font-size: 2.2em; color: var(--primary-color);
-        }
-        .header p { margin: 5px 0 0; color: #ccc; opacity: 0.8; }
-
+        body { font-family: var(--font-main); margin: 0; padding: 0; background-color: var(--light-color); color: var(--dark-color); }
+        .container { max-width: 800px; margin: 20px auto; background-color: var(--white-color); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: var(--dark-color); color: var(--white-color); padding: 25px 30px; text-align: center; }
+        .header h1 { font-family: var(--font-headings); margin: 0; font-size: 2.2em; color: var(--white-color); }
+        .header p { margin: 5px 0 0; color: var(--light-color); opacity: 0.8; }
+        .tab-navigation { display: flex; background-color: #34495e; }
+        .tab-btn { flex: 1; padding: 15px; background: none; border: none; color: var(--light-color); font-size: 1.1em; font-weight: 500; cursor: pointer; transition: background-color 0.3s, color 0.3s; border-bottom: 3px solid transparent; }
+        .tab-btn.active { background-color: var(--white-color); color: var(--dark-color); border-bottom-color: var(--accent-color); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
         .form-content { padding: 30px; }
-        .form-section {
-            margin-bottom: 40px; border: 1px solid #eee;
-            border-radius: 12px; overflow: hidden; background: var(--white-color);
-        }
-        .section-header {
-            padding: 20px; background-color: #fafafa;
-            border-bottom: 1px solid #eee; display: flex; align-items: center;
-        }
-        .section-header h2 {
-            font-family: var(--font-headings); margin: 0;
-            font-size: 1.5em; color: var(--dark-color);
-        }
+        .form-section { margin-bottom: 40px; border: 1px solid #ddd; border-radius: 12px; overflow: hidden; background: var(--white-color); }
+        .section-header { padding: 20px; background-color: #f9f9f9; border-bottom: 1px solid #ddd; display: flex; align-items: center; }
+        .section-header h2 { font-family: var(--font-headings); margin: 0; font-size: 1.5em; color: var(--dark-color); }
         .section-header .icon { font-size: 1.5em; margin-right: 15px; color: var(--primary-color); }
         .section-body { padding: 25px; }
         .form-group { margin-bottom: 30px; }
-        .form-group:last-child { margin-bottom: 0; }
-        label {
-            display: block; font-weight: 600; margin-bottom: 10px;
-            font-size: 1.1em;
-        }
-        label small {
-            display: block; font-weight: 400; color: var(--gray-color);
-            font-size: 0.9em; margin-top: 5px; line-height: 1.5;
-        }
-        input, select, textarea {
-            width: 100%; padding: 14px; border: 1px solid #ccc;
-            border-radius: 8px; font-size: 1em; font-family: var(--font-main);
-            background-color: #fafafa; transition: all 0.2s;
-        }
-        input:focus, select:focus, textarea:focus {
-            outline: none; border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(197, 164, 126, 0.2);
-        }
+        label { display: block; font-weight: 700; margin-bottom: 10px; font-size: 1.1em; }
+        label small { display: block; font-weight: 400; color: var(--gray-color); font-size: 0.9em; margin-top: 5px; line-height: 1.5; }
+        input, select, textarea { width: 100%; padding: 14px; border: 1px solid #ccc; border-radius: 8px; font-size: 1em; font-family: var(--font-main); background-color: #fafafa; transition: all 0.2s; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(52, 73, 94, 0.2); }
         textarea { resize: vertical; min-height: 120px; }
-        .choice-group label {
-            display: flex; align-items: center; margin-bottom: 12px; font-weight: 500;
-            background-color: #f8f8f8; padding: 14px; border-radius: 8px;
-            cursor: pointer; border: 1px solid #eee; transition: all 0.2s;
-        }
-        .choice-group label:has(input:checked) {
-            background-color: #fdfaf6; border-color: var(--primary-color);
-            font-weight: 600; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .choice-group input { margin-right: 12px; transform: scale(1.1); accent-color: var(--primary-color); }
         .button-group { padding: 30px; background-color: #f0f0f0; border-top: 1px solid #ddd; }
-        .btn {
-            display: block; width: 100%; padding: 16px; border: none;
-            border-radius: 8px; font-size: 1.2em; font-weight: 700;
-            cursor: pointer; transition: all 0.3s;
-        }
-        .btn-primary {
-            background: linear-gradient(145deg, var(--primary-color), #b48f65);
-            color: var(--white-color);
-        }
-
-        /* --- Painel de Relatório Moderno --- */
-        .report-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none; /* Alterado por JS */
-            align-items: center; justify-content: center;
-            z-index: 1000; backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            opacity: 0; transition: opacity 0.3s ease;
-        }
-        .report-panel {
-            background: rgba(20, 20, 20, 0.85);
-            color: var(--white-color);
-            width: 90%; max-width: 600px; max-height: 85vh;
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            display: flex; flex-direction: column;
-            transform: scale(0.95);
-            transition: transform 0.3s ease;
-        }
-        .report-header {
-            padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .report-header h2 {
-            font-family: var(--font-headings); margin: 0;
-            color: var(--primary-color); font-size: 1.5em;
-        }
-        .report-header .close-btn {
-            font-size: 28px; color: #fff; cursor: pointer;
-            border: none; background: none; line-height: 1;
-        }
-        .report-body {
-            padding: 25px; overflow-y: auto; white-space: pre-wrap;
-            line-height: 1.8; font-size: 0.95em;
-        }
-        .report-footer {
-            padding: 20px; border-top: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .btn-copy {
-            background-color: var(--success-color); color: #fff;
-        }
+        .btn { display: block; width: 100%; padding: 16px; border: none; border-radius: 8px; font-size: 1.2em; font-weight: 700; cursor: pointer; transition: all 0.3s; }
+        .btn-primary { background-color: var(--primary-color); color: var(--white-color); }
+        .btn-accent { background-color: var(--accent-color); color: var(--white-color); }
+        
+        /* Painel de Relatório */
+        .report-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s ease; }
+        .report-panel { background: var(--dark-color); color: var(--white-color); width: 90%; max-width: 600px; max-height: 85vh; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; flex-direction: column; transform: scale(0.95); transition: transform 0.3s ease; }
+        .report-header { padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-between; align-items: center; }
+        .report-header h2 { font-family: var(--font-headings); margin: 0; color: var(--accent-color); font-size: 1.5em; }
+        .report-header .close-btn { font-size: 28px; color: #fff; cursor: pointer; border: none; background: none; }
+        .report-body { padding: 25px; overflow-y: auto; white-space: pre-wrap; line-height: 1.8; font-size: 0.95em; }
+        .report-footer { padding: 20px; border-top: 1px solid rgba(255, 255, 255, 0.2); }
+        .btn-copy { background-color: var(--success-color); color: #fff; }
     </style>
 </head>
 <body>
-
     <div class="container">
-        <form id="briefing-form">
-            <div class="header">
-                <h1>Briefing Oráculo V4</h1>
-                <p>Painel de Comando Estratégico</p>
-            </div>
+        <header class="header">
+            <h1>Painel de Inteligência</h1>
+            <p>Geração de Briefings & Síntese de Dados</p>
+        </header>
 
+        <nav class="tab-navigation">
+            <button class="tab-btn active" data-tab="briefing">Gerador de Briefing</button>
+            <button class="tab-btn" data-tab="synthesis">Sintetizador de Dados</button>
+        </nav>
+        
+        <div id="settings" class="form-content" style="border-bottom: 1px solid #eee;">
+            <div class="form-group">
+                <label for="userName">Seu Identificador (para salvar na nuvem)</label>
+                <input type="text" id="userName" placeholder="Ex: samir.pesquisa">
+            </div>
+             <div class="form-group">
+                <label for="projectName">Nome do Projeto/Entrevista</label>
+                <input type="text" id="projectName" placeholder="Ex: Entrevista com Técnico Setor Público">
+            </div>
+        </div>
+
+        <div id="briefing" class="tab-content active">
+            <form id="briefing-form">
+                <div id="dynamic-form-content" class="form-content">
+                    </div>
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Gerar e Salvar Briefing</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="synthesis" class="tab-content">
             <div class="form-content">
-                
                 <div class="form-section">
-                    <div class="section-header"><span class="icon">🧭</span><h2>Módulo 1: Diagnóstico e Estratégia</h2></div>
+                    <div class="section-header"><span class="icon">📄</span><h2>Módulo de Síntese de Transcrições</h2></div>
                     <div class="section-body">
                         <div class="form-group">
-                            <label for="currentChallenge">Qual é a principal barreira ou "vício de argumentação" da sua equipe de vendas hoje?</label>
-                            <small>Ex: "Focam apenas em vender a peça mais barata", "Não sabem explicar o valor da tecnologia", "Têm medo de oferecer produtos de maior valor".</small>
-                            <textarea id="currentChallenge" name="currentChallenge"></textarea>
+                            <label for="rawText">Cole aqui o texto bruto da transcrição</label>
+                            <small>Insira o texto completo, mesmo que esteja desorganizado.</small>
+                            <textarea id="rawText" name="rawText" rows="10"></textarea>
                         </div>
                         <div class="form-group">
-                            <label>A GRANDE TRANSFORMAÇÃO: Após o vídeo, o que a vendedora...</label>
-                            <small>PENSARÁ:</small>
-                            <input type="text" name="transformation_think" placeholder="Ex: 'Esta aliança é a minha melhor ferramenta para vender mais.'">
-                            <small style="margin-top:15px;">SENTIRÁ:</small>
-                            <input type="text" name="transformation_feel" placeholder="Ex: 'Confiança total para apresentar esta inovação.'">
-                            <small style="margin-top:15px;">FARÁ:</small>
-                            <input type="text" name="transformation_do" placeholder="Ex: 'Apresentará a aliança oca como a primeira e mais inteligente opção.'">
+                            <label for="categories">Defina as categorias para extração (separadas por vírgula)</label>
+                            <small>Ex: Dores do usuário, Sugestões de melhoria, Principais desafios, Citações importantes</small>
+                            <input type="text" id="categories" name="categories" value="Dores do usuário, Sugestões de melhoria, Desafios mencionados">
                         </div>
                     </div>
                 </div>
-
-                <div class="form-section">
-                    <div class="section-header"><span class="icon">👥</span><h2>Módulo 2: O Público (A Equipe)</h2></div>
-                    <div class="section-body">
-                        <div class="form-group">
-                            <label>Qual o perfil predominante da sua equipe de vendas?</label>
-                            <select name="teamProfile">
-                                <option value="" disabled selected>Selecione o perfil</option>
-                                <option value="Equipe Sênior e Experiente">Equipe Sênior e Experiente</option>
-                                <option value="Equipe Jovem e Dinâmica">Equipe Jovem e Dinâmica</option>
-                                <option value="Equipe Mista (novatos e veteranos)">Equipe Mista (novatos e veteranos)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>O que mais motiva sua equipe?</label>
-                            <select name="teamMotivation">
-                                <option value="" disabled selected>Selecione o motivador</option>
-                                <option value="Comissões e Resultados Financeiros">Comissões e Resultados Financeiros</option>
-                                <option value="Reconhecimento e Destaque">Reconhecimento e Destaque</option>
-                                <option value="Conhecimento do Produto e Status de Especialista">Conhecimento do Produto e Status de Especialista</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <div class="section-header"><span class="icon">👩‍💼</span><h2>Módulo 3: O Avatar e a Direção</h2></div>
-                    <div class="section-body">
-                        <div class="form-group">
-                            <label>Qual arquétipo nosso Avatar deve encarnar?</label>
-                            <select name="avatarPersona">
-                                <option value="" disabled selected>Selecione o arquétipo</option>
-                                <option value="A Estrategista Visionária (elegante, inspira confiança e visão de futuro)">A Estrategista Visionária</option>
-                                <option value="A Mentora Sênior (experiente, didática, focada em resultados práticos)">A Mentora Sênior</option>
-                                <option value="A Especialista Apaixonada (detalhista, eleva o valor percebido do produto)">A Especialista Apaixonada</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Qual a "energia visual" que o vídeo deve transmitir?</label>
-                            <select name="visualEnergy">
-                                <option value="" disabled selected>Selecione a energia</option>
-                                <option value="Clean e Tecnológica (tons neutros, gráficos minimalistas, foco na inovação)">Clean e Tecnológica</option>
-                                <option value="Clássica e Atemporal (elegância, sofisticação, remete ao luxo tradicional)">Clássica e Atemporal</option>
-                                <option value="Vibrante e Inspiradora (dinâmica, motivacional, focada em empoderamento)">Vibrante e Inspiradora</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <div class="section-header"><span class="icon">🎯</span><h2>Módulo 4: Mensagem-Chave</h2></div>
-                    <div class="section-body">
-                        <div class="form-group">
-                            <label for="oneLiner">A "One-Liner": Se você tivesse que resumir a mensagem do vídeo em UMA frase, qual seria?</label>
-                            <input type="text" id="oneLiner" name="oneLiner" placeholder="Ex: 'Venda a joia dos sonhos do cliente com o investimento que ele pode pagar.'">
-                        </div>
-                        <div class="form-group">
-                            <label for="keyObjection">Qual é a principal objeção que este vídeo precisa neutralizar de uma vez por todas?</label>
-                            <input type="text" id="keyObjection" name="keyObjection" placeholder="Ex: 'Mas por ser oca, essa aliança é frágil?'">
-                        </div>
-                    </div>
+                 <div class="button-group">
+                    <button id="generate-prompt-btn" type="button" class="btn btn-accent">Gerar Prompt de Análise</button>
                 </div>
             </div>
-
-            <div class="button-group">
-                <button type="submit" class="btn btn-primary">Gerar Relatório Estratégico</button>
-            </div>
-        </form>
+        </div>
     </div>
     
     <div class="report-overlay" id="report-overlay">
         <div class="report-panel" id="report-panel">
             <div class="report-header">
-                <h2>Relatório Estratégico</h2>
+                <h2 id="report-title">Relatório Gerado</h2>
                 <button class="close-btn" id="close-report-btn">&times;</button>
             </div>
             <div class="report-body" id="report-output"></div>
             <div class="report-footer">
-                <button class="btn btn-copy" id="copy-report-btn">Copiar Relatório</button>
+                <button class="btn btn-copy" id="copy-report-btn">Copiar</button>
             </div>
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('briefing-form');
-            const overlay = document.getElementById('report-overlay');
-            const panel = document.getElementById('report-panel');
-            const closeBtn = document.getElementById('close-report-btn');
-            const copyBtn = document.getElementById('copy-report-btn');
-            const reportOutput = document.getElementById('report-output');
+<script>
+// --- CONFIGURAÇÃO FIREBASE ---
+const firebaseConfig = {
+    apiKey: "AIzaSyAo9iVQm_BzmvNLAUxc4pGL_qp6ic4JQfo",
+    authDomain: "listas-de-compras-ff4a3.firebaseapp.com",
+    databaseURL: "https://listas-de-compras-ff4a3-default-rtdb.firebaseio.com",
+    projectId: "listas-de-compras-ff4a3",
+    storageBucket: "listas-de-compras-ff4a3.firebasestorage.app",
+    messagingSenderId: "623752672529",
+    appId: "1:623752672529:web:ba43bfdad31f050da3c8b0"
+};
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
 
-            form.addEventListener('submit', function(event) {
-                event.preventDefault();
-                
-                const data = new FormData(form);
-                let briefing = "📋 RELATÓRIO ESTRATÉGICO | ORÁCULO V4 📋\n\n";
+// --- CONFIGURAÇÃO DO BRIEFING CUSTOMIZÁVEL ---
+// Edite este objeto para mudar completamente o formulário de briefing.
+const briefingConfig = {
+    modules: [
+        {
+            icon: "🎯",
+            title: "Objetivos Centrais",
+            fields: [
+                { id: "mainGoal", label: "Qual é o objetivo principal deste projeto?", type: "textarea", placeholder: "Ex: Desenvolver um novo dashboard para o time de operações.", help: "Seja específico. O que define o sucesso deste projeto?" },
+                { id: "mainProblem", label: "Qual problema estamos resolvendo?", type: "textarea", placeholder: "Ex: O time atual perde muito tempo consolidando relatórios manualmente.", help: "Descreva a 'dor' que o projeto vai curar." }
+            ]
+        },
+        {
+            icon: "👥",
+            title: "Público-Alvo e Stakeholders",
+            fields: [
+                { id: "targetAudience", label: "Quem é o público-alvo principal?", type: "text", placeholder: "Ex: Gestores de Operações.", help: "Para quem estamos fazendo isso?" },
+                { id: "stakeholders", label: "Quem são os stakeholders chave?", type: "text", placeholder: "Ex: Diretor de TI, Gerente de Produto.", help: "Quem precisa aprovar ou ser consultado?" }
+            ]
+        },
+        {
+            icon: "⚙️",
+            title: "Requisitos e Restrições",
+            fields: [
+                 { id: "coreFeatures", label: "Quais são as funcionalidades essenciais (MVP)?", type: "textarea", placeholder: "1. Visualização de dados em tempo real.\n2. Exportação para PDF.", help: "Liste o que é inegociável para o lançamento." },
+                 { id: "restrictions", label: "Existem restrições (orçamento, prazo, tecnologia)?", type: "textarea", placeholder: "Ex: O projeto deve ser concluído em 3 meses. Deve usar a stack de tecnologia atual da empresa.", help: "Quais são as nossas limitações?" }
+            ]
+        }
+    ]
+};
 
-                briefing += "--- MÓDULO 1: DIAGNÓSTICO E ESTRATÉGIA ---\n";
-                briefing += "▶ Barreira/Vício Atual: " + (data.get('currentChallenge') || 'Não preenchido') + "\n";
-                briefing += "▶ Transformação (PENSAR): " + (data.get('transformation_think') || 'Não preenchido') + "\n";
-                briefing += "▶ Transformação (SENTIR): " + (data.get('transformation_feel') || 'Não preenchido') + "\n";
-                briefing += "▶ Transformação (FAZER): " + (data.get('transformation_do') || 'Não preenchido') + "\n\n";
+document.addEventListener('DOMContentLoaded', function() {
+    // --- LÓGICA DA APLICAÇÃO ---
+    const briefingForm = document.getElementById('briefing-form');
+    const dynamicFormContent = document.getElementById('dynamic-form-content');
+    const overlay = document.getElementById('report-overlay');
+    const panel = document.getElementById('report-panel');
+    const closeBtn = document.getElementById('close-report-btn');
+    const copyBtn = document.getElementById('copy-report-btn');
+    const reportOutput = document.getElementById('report-output');
+    const reportTitle = document.getElementById('report-title');
 
-                briefing += "--- MÓDULO 2: O PÚBLICO (A EQUIPE) ---\n";
-                briefing += "▶ Perfil da Equipe: " + (data.get('teamProfile') || 'Não selecionado') + "\n";
-                briefing += "▶ Principal Motivador: " + (data.get('teamMotivation') || 'Não selecionado') + "\n\n";
-
-                briefing += "--- MÓDULO 3: O AVATAR E A DIREÇÃO ---\n";
-                briefing += "▶ Arquétipo do Avatar: " + (data.get('avatarPersona') || 'Não selecionado') + "\n";
-                briefing += "▶ Energia Visual: " + (data.get('visualEnergy') || 'Não selecionado') + "\n\n";
-
-                briefing += "--- MÓDULO 4: MENSAGEM-CHAVE ---\n";
-                briefing += "▶ One-Liner: " + (data.get('oneLiner') || 'Não preenchido') + "\n";
-                briefing += "▶ Objeção a Neutralizar: " + (data.get('keyObjection') || 'Não preenchido') + "\n\n";
-                
-                briefing += "Gerado em: " + new Date().toLocaleString('pt-BR');
-
-                reportOutput.textContent = briefing;
-                
-                overlay.style.display = 'flex';
-                setTimeout(() => {
-                    overlay.style.opacity = 1;
-                    panel.style.transform = 'scale(1)';
-                }, 10);
-            });
-
-            function closePanel() {
-                overlay.style.opacity = 0;
-                panel.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    overlay.style.display = 'none';
-                }, 300);
-            }
-
-            closeBtn.addEventListener('click', closePanel);
-            overlay.addEventListener('click', function(event) {
-                if (event.target === overlay) {
-                    closePanel();
+    // --- Renderização do Formulário Dinâmico ---
+    function renderDynamicForm() {
+        let html = '';
+        briefingConfig.modules.forEach(module => {
+            html += `
+                <div class="form-section">
+                    <div class="section-header"><span class="icon">${module.icon}</span><h2>${module.title}</h2></div>
+                    <div class="section-body">`;
+            module.fields.forEach(field => {
+                html += `
+                    <div class="form-group">
+                        <label for="${field.id}">${field.label}</label>
+                        <small>${field.help}</small>`;
+                if (field.type === 'textarea') {
+                    html += `<textarea id="${field.id}" name="${field.id}" placeholder="${field.placeholder || ''}"></textarea>`;
+                } else { // 'text' ou 'select' etc.
+                    html += `<input type="text" id="${field.id}" name="${field.id}" placeholder="${field.placeholder || ''}">`;
                 }
+                html += `</div>`;
             });
+            html += `</div></div>`;
+        });
+        dynamicFormContent.innerHTML = html;
+    }
 
-            copyBtn.addEventListener('click', function() {
-                navigator.clipboard.writeText(reportOutput.textContent).then(() => {
-                    copyBtn.textContent = 'Copiado com Sucesso!';
-                    copyBtn.style.backgroundColor = '#198754';
-                    setTimeout(() => {
-                        copyBtn.textContent = 'Copiar Relatório';
-                        copyBtn.style.backgroundColor = 'var(--success-color)';
-                    }, 2000);
-                }).catch(err => {
-                    copyBtn.textContent = 'Erro ao Copiar';
-                    copyBtn.style.backgroundColor = '#dc3545';
-                });
+    // --- Lógica de Abas ---
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            const tabId = button.dataset.tab;
+            tabContents.forEach(content => {
+                content.id === tabId ? content.classList.add('active') : content.classList.remove('active');
             });
         });
-    </script>
+    });
+
+    // --- Geração de Briefing ---
+    briefingForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const userName = document.getElementById('userName').value.trim();
+        const projectName = document.getElementById('projectName').value.trim();
+        if (!userName || !projectName) {
+            alert("Por favor, preencha o seu Identificador e o Nome do Projeto.");
+            return;
+        }
+
+        const formData = new FormData(briefingForm);
+        let briefingReport = `📋 RELATÓRIO DE BRIEFING 📋\n\n`;
+        briefingReport += `Projeto: ${projectName}\n`;
+        briefingReport += `Gerado por: ${userName}\n`;
+        briefingReport += `Data: ${new Date().toLocaleString('pt-BR')}\n`;
+        briefingReport += "========================================\n\n";
+
+        briefingConfig.modules.forEach(module => {
+            briefingReport += `--- ${module.title.toUpperCase()} ---\n`;
+            module.fields.forEach(field => {
+                briefingReport += `▶ ${field.label}:\n`
+                briefingReport += `${formData.get(field.id) || 'Não preenchido'}\n\n`;
+            });
+        });
+
+        reportTitle.textContent = "Briefing Estratégico";
+        showReport(briefingReport);
+
+        // Salvar no Firebase
+        const briefingId = `${new Date().getTime()}-${projectName.replace(/\s+/g, '-')}`;
+        try {
+            await database.ref(`paineis-de-inteligencia/${userName}/${briefingId}`).set({
+                projectName: projectName,
+                createdAt: new Date().toISOString(),
+                content: briefingReport
+            });
+            console.log("Briefing salvo com sucesso no Firebase!");
+        } catch (error) {
+            console.error("Erro ao salvar no Firebase: ", error);
+            alert("Houve um erro ao salvar o briefing. Verifique o console.");
+        }
+    });
+
+    // --- Lógica do Sintetizador de Dados ---
+    document.getElementById('generate-prompt-btn').addEventListener('click', function() {
+        const rawText = document.getElementById('rawText').value.trim();
+        const categories = document.getElementById('categories').value.trim();
+
+        if (!rawText || !categories) {
+            alert("Por favor, preencha o texto bruto e as categorias.");
+            return;
+        }
+
+        let prompt = `**TAREFA DE ANÁLISE E ESTRUTURAÇÃO DE TEXTO**\n\n`;
+        prompt += `**OBJETIVO:** Analisar o texto bruto fornecido e extrair citações diretas (verbatim) que correspondam às categorias especificadas. A tarefa é de ORGANIZAÇÃO, não de sumarização ou reescrita.\n\n`;
+        prompt += `**REGRAS CRÍTICAS:**\n`;
+        prompt += `1.  **NÃO ALTERE O TEXTO ORIGINAL:** Copie e cole as frases ou parágrafos exatos do texto original. Não corrija erros gramaticais, gírias ou vícios de linguagem (como "né", "certo?"). A fidelidade ao original é máxima.\n`;
+        prompt += `2.  **NÃO RESUMA NEM PARAFRASEIE:** O objetivo é agrupar as informações como elas foram ditas, não interpretá-las.\n`;
+        prompt += `3.  Se um trecho se encaixar em mais de uma categoria, você pode repeti-lo.\n`;
+        prompt += `4.  Se nenhuma informação for encontrada para uma categoria, indique "Nenhuma informação encontrada nesta categoria."\n\n`;
+        prompt += `**CATEGORIAS PARA EXTRAÇÃO:**\n- ${categories.split(',').map(c => c.trim()).join('\n- ')}\n\n`;
+        prompt += `**TEXTO BRUTO PARA ANÁLISE:**\n---\n${rawText}\n---\n\n`;
+        prompt += `**FORMATO DA SAÍDA ESPERADA:**\n\n`;
+        prompt += `### Relatório de Síntese da Entrevista\n\n`;
+        categories.split(',').forEach(category => {
+            prompt += `**${category.trim()}**\n- [Citação 1 extraída do texto]\n- [Citação 2 extraída do texto]\n\n`;
+        });
+
+        reportTitle.textContent = "Prompt de Análise Gerado";
+        showReport(prompt);
+    });
+
+    // --- Funções do Painel de Relatório (Popup) ---
+    function showReport(content) {
+        reportOutput.textContent = content;
+        overlay.style.display = 'flex';
+        setTimeout(() => {
+            overlay.style.opacity = 1;
+            panel.style.transform = 'scale(1)';
+        }, 10);
+    }
+    
+    function closePanel() {
+        overlay.style.opacity = 0;
+        panel.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            overlay.style.display = 'none';
+        }, 300);
+    }
+
+    closeBtn.addEventListener('click', closePanel);
+    overlay.addEventListener('click', (event) => { if (event.target === overlay) closePanel(); });
+
+    copyBtn.addEventListener('click', function() {
+        navigator.clipboard.writeText(reportOutput.textContent).then(() => {
+            copyBtn.textContent = 'Copiado com Sucesso!';
+            copyBtn.style.backgroundColor = '#16a085';
+            setTimeout(() => {
+                copyBtn.textContent = 'Copiar';
+                copyBtn.style.backgroundColor = 'var(--success-color)';
+            }, 2000);
+        }).catch(err => { console.error('Erro ao copiar: ', err); });
+    });
+
+    // --- Inicialização ---
+    renderDynamicForm();
+});
+</script>
 </body>
 </html>
