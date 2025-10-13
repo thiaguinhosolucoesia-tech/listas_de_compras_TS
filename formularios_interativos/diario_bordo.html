@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Diário de Bordo Profissional v2.0</title>
+    <title>Diário de Bordo Profissional</title>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
@@ -18,7 +18,7 @@
             --gray-color: #7f8c8d;
             --white-color: #ffffff;
             --success-color: #27ae60;
-            --warning-amber: #f39c12;
+            --danger-color: #e74c3c;
             --border-color: #dfe4ea;
             --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             --font-headings: 'Lato', var(--font-main);
@@ -28,75 +28,58 @@
         html, body { height: 100%; }
         body { font-family: var(--font-main); background-color: var(--light-color); color: var(--dark-color); line-height: 1.6; }
         
-        /* --- Container Principal --- */
         .main-container { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
 
-        /* --- Estilos de Login --- */
-        #login-container { display: flex; align-items: center; justify-content: center; height: 100%; padding: 20px; }
-        .login-box { background: var(--white-color); padding: 40px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
-        .login-box h1 { font-family: var(--font-headings); color: var(--primary-color); margin-bottom: 25px; }
-        .login-box .form-group { margin-bottom: 20px; text-align: left; }
-        .login-box label { display: block; font-weight: 600; margin-bottom: 5px; }
-        .login-box input { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; }
-        .login-box .button-group { display: flex; gap: 10px; margin-top: 25px; }
-        .login-box .btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 1em; font-weight: 600; cursor: pointer; }
-        .btn-primary { background-color: var(--primary-color); color: var(--white-color); }
-        .btn-secondary { background-color: #ecf0f1; color: var(--primary-color); }
-        #login-error { color: #e74c3c; margin-top: 15px; font-size: 0.9em; min-height: 1.2em; }
+        /* --- Tela de Autenticação Pendente --- */
+        #auth-container { display: flex; align-items: center; justify-content: center; height: 100%; text-align: center; }
+        .auth-box { background: var(--white-color); padding: 40px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+        .auth-box h1 { color: var(--primary-color); }
+        .auth-box p { color: var(--gray-color); margin-top: 10px; }
 
         /* --- App Header --- */
         #app-header { background: var(--white-color); padding: 15px 25px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
         #app-header h1 { color: var(--primary-color); font-size: 1.8em; margin: 0; }
         #user-info { display: flex; align-items: center; gap: 15px; }
-        #user-email { color: var(--gray-color); font-size: 0.9em; }
-        #logout-btn { background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        #user-email { color: var(--gray-color); font-size: 0.9em; font-weight: 500; }
+        #logout-btn { background: var(--danger-color); color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: 600; }
 
         /* --- Skeleton Loader --- */
         .skeleton { background-color: #e0e0e0; border-radius: 8px; animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        .skeleton-header { height: 60px; margin-bottom: 20px; }
-        .skeleton-box { height: 300px; }
+        .skeleton-header { height: 74px; margin-bottom: 20px; }
+        .skeleton-nav { height: 40px; width: 300px; margin: 0 auto 25px auto;}
+        .skeleton-box { min-height: 450px; }
+
+        /* --- Estilos do Diário --- */
         .daily-wrapper { display: grid; grid-template-columns: 1fr; gap: 30px; }
         @media (min-width: 900px) { .daily-wrapper { grid-template-columns: 1fr 1fr; } }
-        
-        /* --- Estilos do Diário --- */
-        header { text-align: center; margin-bottom: 25px; }
-        .date-navigation { display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 5px; }
-        .nav-btn { background: none; border: none; font-size: 2.2em; cursor: pointer; color: var(--primary-color); padding: 0 10px; }
+        header.date-header { text-align: center; margin-bottom: 25px; }
+        .date-navigation { display: flex; align-items: center; justify-content: center; gap: 15px; }
+        .nav-btn { background: none; border: none; font-size: 2.2em; cursor: pointer; color: var(--primary-color); padding: 0 10px; transition: color 0.2s; }
+        .nav-btn:disabled { color: #bdc3c7; cursor: not-allowed; }
         #currentDate { font-size: 1.3em; color: var(--primary-color); font-weight: 600; }
-        .section-box { border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; background-color: var(--white-color); }
-        .section-box h2 { font-size: 1.6em; color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; }
-        input[type="text"], input[type="number"], textarea { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 5px; font-size: 1em; }
+        .section-box { border: 1px solid var(--border-color); border-radius: 12px; padding: 25px; background-color: var(--white-color); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .section-box h2 { font-family: var(--font-headings); font-size: 1.6em; color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; }
+        .form-section { margin-bottom: 20px; }
+        .form-section label { display: block; font-weight: 600; margin-bottom: 8px; color: #444; }
+        input[type="text"], input[type="number"], textarea { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 1em; }
         textarea { min-height: 100px; resize: vertical; }
         .button-container { text-align: center; margin-top: 25px; }
-        button#endDayBtn { background-color: var(--accent-color); color: var(--white-color); border: none; padding: 12px 25px; border-radius: 8px; font-size: 1.05em; font-weight: 600; cursor: pointer; }
-        footer { text-align: center; margin-top: 40px; color: var(--gray-color); font-size: 0.9em; }
+        .btn-action { background-color: var(--accent-color); color: var(--white-color); border: none; padding: 12px 25px; border-radius: 8px; font-size: 1.05em; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
+        .btn-action:hover { background-color: #2980b9; }
+        footer { text-align: center; margin-top: 40px; color: var(--gray-color); font-size: 0.9em; padding: 20px 0; }
     </style>
 </head>
 <body>
-    <div id="login-container">
-        <div class="login-box">
-            <h1>Diário de Bordo</h1>
-            <p>Acesse sua conta ou crie uma nova.</p>
-            <form id="login-form">
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Senha</label>
-                    <input type="password" id="password" required>
-                </div>
-                <div id="login-error"></div>
-                <div class="button-group">
-                    <button type="button" id="login-btn" class="btn btn-primary">Entrar</button>
-                    <button type="button" id="signup-btn" class="btn btn-secondary">Cadastrar</button>
-                </div>
-            </form>
+    <div id="auth-container">
+        <div class="auth-box">
+            <h1>Aguardando Autenticação</h1>
+            <p>Por favor, faça login em sua plataforma para continuar.</p>
         </div>
     </div>
 
     <div id="loader-container" class="main-container" style="display: none;">
         <div class="skeleton skeleton-header"></div>
+        <div class="skeleton skeleton-nav"></div>
         <div class="daily-wrapper">
             <div class="skeleton skeleton-box"></div>
             <div class="skeleton skeleton-box"></div>
@@ -105,7 +88,7 @@
 
     <div id="app-container" class="main-container" style="display: none;">
         <header id="app-header">
-            <h1>Diário de Bordo</h1>
+            <h1>Diário de Bordo Profissional</h1>
             <div id="user-info">
                 <span id="user-email"></span>
                 <button id="logout-btn">Sair</button>
@@ -113,7 +96,7 @@
         </header>
 
         <main>
-            <header>
+            <header class="date-header">
                 <div class="date-navigation">
                     <button id="prevDayBtn" class="nav-btn">&lt;</button>
                     <p id="currentDate"></p>
@@ -125,7 +108,7 @@
                 <div id="planningBox" class="section-box">
                     <h2>Planejamento do Dia</h2>
                     <form id="planningForm">
-                        <div class="form-section"><label for="dailyFocus">Foco Principal do Dia</label><input type="text" id="dailyFocus" placeholder="Ex: Avançar 20% no relatório de vendas trimestral."></div>
+                         <div class="form-section"><label for="dailyFocus">Foco Principal do Dia</label><input type="text" id="dailyFocus" placeholder="Ex: Avançar 20% no relatório de vendas trimestral."></div>
                          <div class="form-section"><label for="criticalTasks">Prioridades (Sua atuação direta)</label><textarea id="criticalTasks" rows="3" placeholder="Ex: Alinhar escopo do projeto Y com o Diretor."></textarea></div>
                     </form>
                 </div>
@@ -136,7 +119,7 @@
                         <div class="form-section"><label for="mainChallenge">Principal Desafio/Aprendizado</label><input type="text" id="mainChallenge" placeholder="O que te bloqueou ou o que você aprendeu?"></div>
                     </form>
                     <div class="button-container">
-                        <button type="button" id="endDayBtn">Salvar e Finalizar Dia</button>
+                        <button type="button" id="saveDayBtn" class="btn-action">Salvar Dia</button>
                     </div>
                 </div>
             </div>
@@ -146,8 +129,6 @@
     </div>
 
     <script>
-    // --- INÍCIO DA CONFIGURAÇÃO FIREBASE ---
-    // SUBSTITUA ESTES VALORES PELOS DO SEU PROJETO FIREBASE
     const firebaseConfig = {
         apiKey: "AIzaSyAo9iVQm_BzmvNLAUxc4pGL_qp6ic4JQfo",
         authDomain: "listas-de-compras-ff4a3.firebaseapp.com",
@@ -157,21 +138,16 @@
         messagingSenderId: "623752672529",
         appId: "1:623752672529:web:ba43bfdad31f050da3c8b0"
     };
-    // --- FIM DA CONFIGURAÇÃO FIREBASE ---
 
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const database = firebase.database();
 
     document.addEventListener('DOMContentLoaded', () => {
-        const loginContainer = document.getElementById('login-container');
+        const authContainer = document.getElementById('auth-container');
         const appContainer = document.getElementById('app-container');
         const loaderContainer = document.getElementById('loader-container');
-        
-        const loginBtn = document.getElementById('login-btn');
-        const signupBtn = document.getElementById('signup-btn');
         const logoutBtn = document.getElementById('logout-btn');
-        const loginError = document.getElementById('login-error');
 
         const App = {
             data: {},
@@ -186,78 +162,46 @@
                 this.addEventListeners();
             },
 
-            showLoader() {
-                loginContainer.style.display = 'none';
-                appContainer.style.display = 'none';
-                loaderContainer.style.display = 'block';
-            },
-
-            hideLoader() {
-                loaderContainer.style.display = 'none';
+            showView(view) {
+                loaderContainer.style.display = view === 'loader' ? 'block' : 'none';
+                authContainer.style.display = view === 'auth' ? 'flex' : 'none';
+                appContainer.style.display = view === 'app' ? 'block' : 'none';
             },
 
             addAuthListeners() {
                 auth.onAuthStateChanged(user => {
-                    this.showLoader();
                     if (user) {
+                        this.showView('loader');
                         this.currentUser = user;
                         document.getElementById('user-email').textContent = user.email;
-                        this.hideLoader();
-                        loginContainer.style.display = 'none';
-                        appContainer.style.display = 'block';
                         this.loadDayData(this.getDateString(this.displayedDate));
                     } else {
                         this.currentUser = null;
-                        this.hideLoader();
-                        appContainer.style.display = 'none';
-                        loginContainer.style.display = 'flex';
+                        this.showView('auth');
                     }
                 });
 
-                loginBtn.addEventListener('click', () => {
-                    const email = document.getElementById('email').value;
-                    const password = document.getElementById('password').value;
-                    auth.signInWithEmailAndPassword(email, password)
-                        .catch(error => loginError.textContent = this.getFriendlyAuthError(error.code));
+                logoutBtn.addEventListener('click', () => {
+                    auth.signOut().catch(error => console.error("Erro ao fazer logout:", error));
                 });
-
-                signupBtn.addEventListener('click', () => {
-                    const email = document.getElementById('email').value;
-                    const password = document.getElementById('password').value;
-                    auth.createUserWithEmailAndPassword(email, password)
-                        .catch(error => loginError.textContent = this.getFriendlyAuthError(error.code));
-                });
-
-                logoutBtn.addEventListener('click', () => auth.signOut());
-            },
-            
-            getFriendlyAuthError(code) {
-                switch (code) {
-                    case 'auth/wrong-password': return 'Senha incorreta. Tente novamente.';
-                    case 'auth/user-not-found': return 'Nenhum usuário encontrado com este email.';
-                    case 'auth/invalid-email': return 'O formato do email é inválido.';
-                    case 'auth/weak-password': return 'A senha deve ter pelo menos 6 caracteres.';
-                    case 'auth/email-already-in-use': return 'Este email já está cadastrado.';
-                    default: return 'Ocorreu um erro. Tente novamente.';
-                }
             },
 
             getDateString: date => date.toISOString().split('T')[0],
 
             async loadDayData(dateString) {
                 if (!this.currentUser) return;
-                this.showLoader();
-                const dataRef = database.ref(`diario-de-bordo/${this.currentUser.uid}/${dateString}`);
+                this.showView('loader');
+                // CAMINHO ADAPTADO PARA AS REGRAS FORNECIDAS
+                const dataRef = database.ref(`easy_lists/${this.currentUser.uid}/diario_de_bordo/${dateString}`);
                 try {
                     const snapshot = await dataRef.once('value');
                     this.data[dateString] = snapshot.val();
                     this.renderDay(dateString);
                 } catch (error) {
                     console.error("Erro ao carregar dados do Firebase:", error);
-                    alert("Não foi possível carregar os dados.");
+                    alert("Não foi possível carregar os dados. Verifique as regras de segurança do seu banco de dados.");
                 } finally {
-                   this.hideLoader();
-                   appContainer.style.display = 'block'; // Garante que o app seja exibido
+                   this.showView('app');
                 }
             },
 
@@ -274,7 +218,7 @@
             },
             
             addEventListeners() {
-                document.getElementById('endDayBtn').addEventListener('click', () => this.saveCurrentState());
+                document.getElementById('saveDayBtn').addEventListener('click', () => this.saveCurrentState());
                 document.getElementById('prevDayBtn').addEventListener('click', () => this.navigateDays(-1));
                 document.getElementById('nextDayBtn').addEventListener('click', () => this.navigateDays(1));
             },
@@ -287,34 +231,32 @@
             async saveCurrentState() {
                 const dateString = this.getDateString(this.displayedDate);
                 if (!this.currentUser) {
-                    alert("Você precisa estar logado para salvar.");
+                    alert("Sessão expirada. Por favor, faça login novamente.");
                     return false;
                 }
 
-                const plan = {
-                    dailyFocus: document.getElementById('dailyFocus').value.trim(),
-                    criticalTasks: document.getElementById('criticalTasks').value.trim(),
-                };
-                const review = {
-                    mainAchievement: document.getElementById('mainAchievement').value.trim(),
-                    mainChallenge: document.getElementById('mainChallenge').value.trim(),
-                };
-                
                 const dayData = {
-                    plan,
-                    review,
+                    plan: {
+                        dailyFocus: document.getElementById('dailyFocus').value.trim(),
+                        criticalTasks: document.getElementById('criticalTasks').value.trim(),
+                    },
+                    review: {
+                        mainAchievement: document.getElementById('mainAchievement').value.trim(),
+                        mainChallenge: document.getElementById('mainChallenge').value.trim(),
+                    },
                     lastUpdated: new Date().toISOString()
                 };
                 
                 try {
-                    const dataRef = database.ref(`diario-de-bordo/${this.currentUser.uid}/${dateString}`);
+                    // CAMINHO ADAPTADO PARA AS REGRAS FORNECIDAS
+                    const dataRef = database.ref(`easy_lists/${this.currentUser.uid}/diario_de_bordo/${dateString}`);
                     await dataRef.set(dayData);
                     alert('Dia salvo com sucesso!');
                     this.data[dateString] = dayData;
                     return true;
                 } catch (error) {
                     console.error("Erro ao salvar no Firebase:", error);
-                    alert("Não foi possível salvar os dados.");
+                    alert("Não foi possível salvar os dados. A permissão foi negada. Verifique as regras de segurança do banco de dados.");
                     return false;
                 }
             },
