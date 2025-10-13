@@ -11,14 +11,9 @@
     
     <style>
         :root {
-            --primary-color: #34495e; /* Azul corporativo sóbrio */
-            --accent-color: #1abc9c; /* Verde para ações */
-            --dark-color: #2c3e50;
-            --light-color: #ecf0f1;
-            --gray-color: #7f8c8d;
-            --white-color: #ffffff;
-            --success-color: #27ae60;
-            --danger-color: #c0392b;
+            --primary-color: #34495e; --accent-color: #1abc9c; --dark-color: #2c3e50;
+            --light-color: #ecf0f1; --gray-color: #7f8c8d; --white-color: #ffffff;
+            --success-color: #27ae60; --danger-color: #c0392b;
             --font-main: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             --font-headings: 'Lato', serif;
         }
@@ -27,38 +22,32 @@
         body { font-family: var(--font-main); margin: 0; padding: 0; background-color: var(--light-color); color: var(--dark-color); }
         .container { max-width: 800px; margin: 20px auto; background-color: var(--white-color); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
 
-        /* Estilos de Autenticação Pendente */
         #auth-container { display: none; align-items: center; justify-content: center; padding: 50px 20px; text-align: center; }
         .auth-box { background: var(--white-color); padding: 40px; border-radius: 12px; }
         .auth-box h1 { color: var(--danger-color); }
         .auth-box p { color: var(--gray-color); margin-top: 10px; }
         
-        /* Estilos App */
-        .header { background: var(--dark-color); color: var(--white-color); padding: 25px 30px; text-align: center; }
-        .header h1 { font-family: var(--font-headings); margin: 0; font-size: 2.2em; }
         #app-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background-color: var(--white-color); border-bottom: 1px solid #eee; }
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .back-btn { background-color: var(--light-color); color: var(--primary-color); text-decoration: none; padding: 8px 15px; border-radius: 8px; font-weight: 600; display: flex; align-items: center; gap: 5px; transition: background-color 0.2s; }
+        .back-btn:hover { background-color: #e0e5e9; }
         #app-header #user-email { color: var(--gray-color); }
         #app-header #logout-btn { background: var(--danger-color); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; }
         
         .tab-navigation { display: flex; background-color: #34495e; }
-        .tab-btn { flex: 1; padding: 15px; background: none; border: none; color: var(--light-color); font-size: 1.1em; font-weight: 500; cursor: pointer; transition: all 0.3s; border-bottom: 3px solid transparent; }
+        .tab-btn { flex: 1; padding: 15px; background: none; border: none; color: var(--light-color); font-size: 1.1em; font-weight: 500; cursor: pointer; border-bottom: 3px solid transparent; }
         .tab-btn.active { background-color: var(--white-color); color: var(--dark-color); border-bottom-color: var(--accent-color); }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .form-content { padding: 30px; }
+        .tab-content { display: none; } .tab-content.active { display: block; } .form-content { padding: 30px; }
         .form-section { margin-bottom: 40px; border: 1px solid #ddd; border-radius: 12px; overflow: hidden; }
         .section-header { padding: 20px; background-color: #f9f9f9; border-bottom: 1px solid #ddd; }
         .section-header h2 { font-family: var(--font-headings); margin: 0; font-size: 1.5em; }
-        .section-body { padding: 25px; }
-        .form-group { margin-bottom: 30px; }
-        label { display: block; font-weight: 700; margin-bottom: 10px; }
-        label small { display: block; font-weight: 400; color: var(--gray-color); }
+        .section-body { padding: 25px; } .form-group { margin-bottom: 30px; }
+        label { display: block; font-weight: 700; margin-bottom: 10px; } label small { display: block; font-weight: 400; color: var(--gray-color); }
         input, select, textarea { width: 100%; padding: 14px; border: 1px solid #ccc; border-radius: 8px; font-size: 1em; }
         textarea { resize: vertical; min-height: 120px; }
         .button-group { padding: 30px; background-color: #f0f0f0; border-top: 1px solid #ddd; }
         .btn-action { display: block; width: 100%; padding: 16px; border: none; border-radius: 8px; font-size: 1.2em; font-weight: 700; cursor: pointer; color: var(--white-color); }
         
-        /* Painel de Relatório */
         .report-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s ease; }
         .report-panel { background: var(--dark-color); color: var(--white-color); width: 90%; max-width: 600px; max-height: 85vh; border-radius: 16px; display: flex; flex-direction: column; transform: scale(0.95); transition: transform 0.3s ease; }
         .report-header { padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-between; align-items: center; }
@@ -71,20 +60,16 @@
 </head>
 <body>
     <div id="auth-container">
-        <div class="auth-box">
-            <h1>Acesso Negado</h1>
-            <p>Sua sessão é inválida ou expirou. Por favor, retorne à plataforma e faça login novamente.</p>
-        </div>
+        <div class="auth-box"><h1>Acesso Negado</h1><p>Sua sessão é inválida ou expirou. Por favor, retorne à plataforma e faça login novamente.</p></div>
     </div>
 
     <div id="app-container" class="container" style="display: none;">
         <header id="app-header">
+             <div class="header-left">
+                <a href="index.html" class="back-btn"><span>&larr;</span> Voltar</a>
+            </div>
             <span id="user-email"></span>
             <button id="logout-btn">Sair</button>
-        </header>
-
-        <header class="header">
-            <h1>Painel de Inteligência</h1>
         </header>
 
         <nav class="tab-navigation">
@@ -93,7 +78,7 @@
         </nav>
         
         <div class="form-content" style="border-bottom: 1px solid #eee;">
-             <div class="form-group"><label for="projectName">Nome do Projeto/Entrevista</label><input type="text" id="projectName" placeholder="Ex: Entrevista com Técnico Setor Público"></div>
+             <div class="form-group"><label for="projectName">Nome do Projeto / Briefing</label><input type="text" id="projectName" placeholder="Ex: Campanha de Marketing Q4"></div>
         </div>
 
         <div id="briefing" class="tab-content active">
@@ -121,21 +106,64 @@
 
 <script>
 const firebaseConfig = {
-    apiKey: "AIzaSyAo9iVQm_BzmvNLAUxc4pGL_qp6ic4JQfo",
-    authDomain: "listas-de-compras-ff4a3.firebaseapp.com",
-    databaseURL: "https://listas-de-compras-ff4a3-default-rtdb.firebaseio.com",
-    projectId: "listas-de-compras-ff4a3",
-    storageBucket: "listas-de-compras-ff4a3.firebasestorage.app",
-    messagingSenderId: "623752672529",
+    apiKey: "AIzaSyAo9iVQm_BzmvNLAUxc4pGL_qp6ic4JQfo", authDomain: "listas-de-compras-ff4a3.firebaseapp.com",
+    databaseURL: "https://listas-de-compras-ff4a3-default-rtdb.firebaseio.com", projectId: "listas-de-compras-ff4a3",
+    storageBucket: "listas-de-compras-ff4a3.firebasestorage.app", messagingSenderId: "623752672529",
     appId: "1:623752672529:web:ba43bfdad31f050da3c8b0"
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const database = firebase.database();
 
+// =============== CONFIGURAÇÃO DO BRIEFING CUSTOMIZÁVEL ===============
+// Edite este objeto para criar qualquer tipo de formulário de briefing.
+// A interface será construída automaticamente a partir daqui.
+// Exemplos de 'type': 'text', 'textarea'.
 const briefingConfig = {
-    modules: [{ icon: "🎯", title: "Objetivos Centrais", fields: [{ id: "mainGoal", label: "Qual é o objetivo principal deste projeto?", type: "textarea", help: "O que define o sucesso?" }, { id: "mainProblem", label: "Qual problema estamos resolvendo?", type: "textarea", help: "Descreva a 'dor' que o projeto vai curar." }] }, { icon: "👥", title: "Público-Alvo e Stakeholders", fields: [{ id: "targetAudience", label: "Quem é o público-alvo principal?", type: "text", help: "Para quem estamos fazendo isso?" }, { id: "stakeholders", label: "Quem são os stakeholders chave?", type: "text", help: "Quem precisa aprovar ou ser consultado?" }] }, { icon: "⚙️", title: "Requisitos e Restrições", fields: [{ id: "coreFeatures", label: "Funcionalidades essenciais (MVP)?", type: "textarea", help: "Liste o que é inegociável." }, { id: "restrictions", label: "Existem restrições (orçamento, prazo)?", type: "textarea", help: "Quais são as nossas limitações?" }] }]
+    modules: [
+        { 
+            icon: "📜", 
+            title: "Contexto e Justificativa", 
+            fields: [
+                { id: "background", label: "Background do Projeto", type: "textarea", help: "Qual é a história por trás desta necessidade? Qual problema estamos resolvendo?" },
+                { id: "justification", label: "Por que agora?", type: "text", help: "Qual a urgência ou oportunidade que motiva este projeto neste momento?" }
+            ] 
+        },
+        { 
+            icon: "🎯", 
+            title: "Objetivos e Metas", 
+            fields: [
+                { id: "mainGoal", label: "Objetivo Principal", type: "text", help: "Qual é a única coisa que este projeto precisa alcançar para ser um sucesso?" },
+                { id: "smartGoals", label: "Metas SMART", type: "textarea", help: "Liste metas Específicas, Mensuráveis, Atingíveis, Relevantes e com Prazo." }
+            ] 
+        },
+        { 
+            icon: "👥", 
+            title: "Público e Stakeholders", 
+            fields: [
+                { id: "targetAudience", label: "Público-Alvo", type: "textarea", help: "Para quem estamos fazendo isso? Descreva o perfil, dores e necessidades." },
+                { id: "stakeholders", label: "Stakeholders Principais", type: "text", help: "Quem são as pessoas chave (aprovadores, consultados, informados)?" }
+            ] 
+        },
+        { 
+            icon: "📦", 
+            title: "Escopo e Entregáveis", 
+            fields: [
+                { id: "deliverables", label: "Entregáveis Finais", type: "textarea", help: "O que será produzido concretamente? (Ex: Relatório, Protótipo, Campanha, Website)" },
+                { id: "outOfScope", label: "Fora do Escopo", type: "textarea", help: "O que explicitamente NÃO será feito neste projeto?" }
+            ] 
+        },
+        { 
+            icon: "⚠️", 
+            title: "Restrições e Premissas", 
+            fields: [
+                { id: "constraints", label: "Restrições Conhecidas", type: "textarea", help: "Quais são as limitações de orçamento, prazo, tecnologia ou recursos?" },
+                { id: "assumptions", label: "Premissas", type: "textarea", help: "O que estamos assumindo como verdadeiro para que este projeto seja viável?" }
+            ] 
+        }
+    ]
 };
+// =====================================================================
 
 document.addEventListener('DOMContentLoaded', function() {
     const App = {
@@ -163,7 +191,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.showView('auth');
                 }
             });
-            
             document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
         },
 
@@ -204,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         async handleBriefingSubmit(event) {
             event.preventDefault();
-            if (!this.currentUser) { alert("Sessão expirada. Por favor, faça login novamente."); return; }
+            if (!this.currentUser) { alert("Sessão expirada."); return; }
             
             const projectName = document.getElementById('projectName').value.trim();
             if (!projectName) { alert("Por favor, preencha o Nome do Projeto."); return; }
