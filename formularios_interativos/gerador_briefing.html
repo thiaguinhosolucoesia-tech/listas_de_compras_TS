@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Painel de Inteligência & Estruturação</title>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    
     <style>
         :root {
             --primary-color: #34495e; /* Azul corporativo sóbrio */
@@ -15,54 +18,73 @@
             --gray-color: #7f8c8d;
             --white-color: #ffffff;
             --success-color: #27ae60;
+            --danger-color: #c0392b;
             --font-main: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             --font-headings: 'Lato', serif;
         }
         @import url('https://fonts.googleapis.com/css2?family=Lato:wght@700&family=Roboto:wght@400;500;700&display=swap');
-        *, *::before, *::after { box-sizing: border-box; }
+        * { box-sizing: border-box; }
         body { font-family: var(--font-main); margin: 0; padding: 0; background-color: var(--light-color); color: var(--dark-color); }
         .container { max-width: 800px; margin: 20px auto; background-color: var(--white-color); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+
+        /* Estilos de Autenticação Pendente */
+        #auth-container { display: flex; align-items: center; justify-content: center; padding: 50px 20px; text-align: center; }
+        .auth-box { background: var(--white-color); padding: 40px; border-radius: 12px; }
+        .auth-box h1 { color: var(--primary-color); }
+        .auth-box p { color: var(--gray-color); margin-top: 10px; }
+        
+        /* Estilos App */
         .header { background: var(--dark-color); color: var(--white-color); padding: 25px 30px; text-align: center; }
-        .header h1 { font-family: var(--font-headings); margin: 0; font-size: 2.2em; color: var(--white-color); }
-        .header p { margin: 5px 0 0; color: var(--light-color); opacity: 0.8; }
+        .header h1 { font-family: var(--font-headings); margin: 0; font-size: 2.2em; }
+        #app-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background-color: var(--white-color); border-bottom: 1px solid #eee; }
+        #app-header #user-email { color: var(--gray-color); }
+        #app-header #logout-btn { background: var(--danger-color); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        
         .tab-navigation { display: flex; background-color: #34495e; }
-        .tab-btn { flex: 1; padding: 15px; background: none; border: none; color: var(--light-color); font-size: 1.1em; font-weight: 500; cursor: pointer; transition: background-color 0.3s, color 0.3s; border-bottom: 3px solid transparent; }
+        .tab-btn { flex: 1; padding: 15px; background: none; border: none; color: var(--light-color); font-size: 1.1em; font-weight: 500; cursor: pointer; transition: all 0.3s; border-bottom: 3px solid transparent; }
         .tab-btn.active { background-color: var(--white-color); color: var(--dark-color); border-bottom-color: var(--accent-color); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .form-content { padding: 30px; }
-        .form-section { margin-bottom: 40px; border: 1px solid #ddd; border-radius: 12px; overflow: hidden; background: var(--white-color); }
-        .section-header { padding: 20px; background-color: #f9f9f9; border-bottom: 1px solid #ddd; display: flex; align-items: center; }
-        .section-header h2 { font-family: var(--font-headings); margin: 0; font-size: 1.5em; color: var(--dark-color); }
-        .section-header .icon { font-size: 1.5em; margin-right: 15px; color: var(--primary-color); }
+        .form-section { margin-bottom: 40px; border: 1px solid #ddd; border-radius: 12px; overflow: hidden; }
+        .section-header { padding: 20px; background-color: #f9f9f9; border-bottom: 1px solid #ddd; }
+        .section-header h2 { font-family: var(--font-headings); margin: 0; font-size: 1.5em; }
         .section-body { padding: 25px; }
         .form-group { margin-bottom: 30px; }
-        label { display: block; font-weight: 700; margin-bottom: 10px; font-size: 1.1em; }
-        label small { display: block; font-weight: 400; color: var(--gray-color); font-size: 0.9em; margin-top: 5px; line-height: 1.5; }
-        input, select, textarea { width: 100%; padding: 14px; border: 1px solid #ccc; border-radius: 8px; font-size: 1em; font-family: var(--font-main); background-color: #fafafa; transition: all 0.2s; }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(52, 73, 94, 0.2); }
+        label { display: block; font-weight: 700; margin-bottom: 10px; }
+        label small { display: block; font-weight: 400; color: var(--gray-color); }
+        input, select, textarea { width: 100%; padding: 14px; border: 1px solid #ccc; border-radius: 8px; font-size: 1em; }
         textarea { resize: vertical; min-height: 120px; }
         .button-group { padding: 30px; background-color: #f0f0f0; border-top: 1px solid #ddd; }
-        .btn { display: block; width: 100%; padding: 16px; border: none; border-radius: 8px; font-size: 1.2em; font-weight: 700; cursor: pointer; transition: all 0.3s; }
-        .btn-primary { background-color: var(--primary-color); color: var(--white-color); }
-        .btn-accent { background-color: var(--accent-color); color: var(--white-color); }
+        .btn-action { display: block; width: 100%; padding: 16px; border: none; border-radius: 8px; font-size: 1.2em; font-weight: 700; cursor: pointer; color: var(--white-color); }
         
         /* Painel de Relatório */
         .report-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s ease; }
-        .report-panel { background: var(--dark-color); color: var(--white-color); width: 90%; max-width: 600px; max-height: 85vh; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; flex-direction: column; transform: scale(0.95); transition: transform 0.3s ease; }
+        .report-panel { background: var(--dark-color); color: var(--white-color); width: 90%; max-width: 600px; max-height: 85vh; border-radius: 16px; display: flex; flex-direction: column; transform: scale(0.95); transition: transform 0.3s ease; }
         .report-header { padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); display: flex; justify-content: space-between; align-items: center; }
-        .report-header h2 { font-family: var(--font-headings); margin: 0; color: var(--accent-color); font-size: 1.5em; }
-        .report-header .close-btn { font-size: 28px; color: #fff; cursor: pointer; border: none; background: none; }
-        .report-body { padding: 25px; overflow-y: auto; white-space: pre-wrap; line-height: 1.8; font-size: 0.95em; }
+        .report-header h2 { color: var(--accent-color); font-size: 1.5em; }
+        .report-header .close-btn { font-size: 28px; color: #fff; cursor: pointer; background: none; border: none; }
+        .report-body { padding: 25px; overflow-y: auto; white-space: pre-wrap; line-height: 1.8; }
         .report-footer { padding: 20px; border-top: 1px solid rgba(255, 255, 255, 0.2); }
-        .btn-copy { background-color: var(--success-color); color: #fff; }
+        .btn-copy { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background-color: var(--success-color); color: #fff; }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div id="auth-container">
+        <div class="auth-box">
+            <h1>Aguardando Autenticação</h1>
+            <p>Por favor, faça login em sua plataforma para acessar o Painel de Inteligência.</p>
+        </div>
+    </div>
+
+    <div id="app-container" class="container" style="display: none;">
+        <header id="app-header">
+            <span id="user-email"></span>
+            <button id="logout-btn">Sair</button>
+        </header>
+
         <header class="header">
             <h1>Painel de Inteligência</h1>
-            <p>Geração de Briefings & Síntese de Dados</p>
         </header>
 
         <nav class="tab-navigation">
@@ -70,66 +92,34 @@
             <button class="tab-btn" data-tab="synthesis">Sintetizador de Dados</button>
         </nav>
         
-        <div id="settings" class="form-content" style="border-bottom: 1px solid #eee;">
-            <div class="form-group">
-                <label for="userName">Seu Identificador (para salvar na nuvem)</label>
-                <input type="text" id="userName" placeholder="Ex: samir.pesquisa">
-            </div>
-             <div class="form-group">
-                <label for="projectName">Nome do Projeto/Entrevista</label>
-                <input type="text" id="projectName" placeholder="Ex: Entrevista com Técnico Setor Público">
-            </div>
+        <div class="form-content" style="border-bottom: 1px solid #eee;">
+             <div class="form-group"><label for="projectName">Nome do Projeto/Entrevista</label><input type="text" id="projectName" placeholder="Ex: Entrevista com Técnico Setor Público"></div>
         </div>
 
         <div id="briefing" class="tab-content active">
             <form id="briefing-form">
-                <div id="dynamic-form-content" class="form-content">
-                    </div>
-                <div class="button-group">
-                    <button type="submit" class="btn btn-primary">Gerar e Salvar Briefing</button>
-                </div>
+                <div id="dynamic-form-content" class="form-content"></div>
+                <div class="button-group"><button type="submit" class="btn-action" style="background-color: var(--primary-color);">Gerar e Salvar Briefing</button></div>
             </form>
         </div>
 
         <div id="synthesis" class="tab-content">
             <div class="form-content">
-                <div class="form-section">
-                    <div class="section-header"><span class="icon">📄</span><h2>Módulo de Síntese de Transcrições</h2></div>
+                <div class="form-section"><div class="section-header"><h2>Módulo de Síntese de Transcrições</h2></div>
                     <div class="section-body">
-                        <div class="form-group">
-                            <label for="rawText">Cole aqui o texto bruto da transcrição</label>
-                            <small>Insira o texto completo, mesmo que esteja desorganizado.</small>
-                            <textarea id="rawText" name="rawText" rows="10"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="categories">Defina as categorias para extração (separadas por vírgula)</label>
-                            <small>Ex: Dores do usuário, Sugestões de melhoria, Principais desafios, Citações importantes</small>
-                            <input type="text" id="categories" name="categories" value="Dores do usuário, Sugestões de melhoria, Desafios mencionados">
-                        </div>
+                        <div class="form-group"><label for="rawText">Cole aqui o texto bruto</label><textarea id="rawText" name="rawText" rows="10"></textarea></div>
+                        <div class="form-group"><label for="categories">Categorias para extração (separadas por vírgula)</label><input type="text" id="categories" name="categories" value="Dores, Sugestões, Desafios"></div>
                     </div>
                 </div>
-                 <div class="button-group">
-                    <button id="generate-prompt-btn" type="button" class="btn btn-accent">Gerar Prompt de Análise</button>
-                </div>
+                 <div class="button-group"><button id="generate-prompt-btn" type="button" class="btn-action" style="background-color: var(--accent-color);">Gerar Prompt de Análise</button></div>
             </div>
         </div>
+        <footer><p style="padding: 20px; text-align: center; color: var(--gray-color);">Desenvolvido com 🤖 por thIAguinho Soluções</p></footer>
     </div>
     
-    <div class="report-overlay" id="report-overlay">
-        <div class="report-panel" id="report-panel">
-            <div class="report-header">
-                <h2 id="report-title">Relatório Gerado</h2>
-                <button class="close-btn" id="close-report-btn">&times;</button>
-            </div>
-            <div class="report-body" id="report-output"></div>
-            <div class="report-footer">
-                <button class="btn btn-copy" id="copy-report-btn">Copiar</button>
-            </div>
-        </div>
-    </div>
+    <div class="report-overlay" id="report-overlay"><div class="report-panel" id="report-panel"><div class="report-header"><h2 id="report-title">Relatório</h2><button class="close-btn" id="close-report-btn">&times;</button></div><div class="report-body" id="report-output"></div><div class="report-footer"><button class="btn-copy" id="copy-report-btn">Copiar</button></div></div></div>
 
 <script>
-// --- CONFIGURAÇÃO FIREBASE ---
 const firebaseConfig = {
     apiKey: "AIzaSyAo9iVQm_BzmvNLAUxc4pGL_qp6ic4JQfo",
     authDomain: "listas-de-compras-ff4a3.firebaseapp.com",
@@ -140,195 +130,159 @@ const firebaseConfig = {
     appId: "1:623752672529:web:ba43bfdad31f050da3c8b0"
 };
 firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 const database = firebase.database();
 
-// --- CONFIGURAÇÃO DO BRIEFING CUSTOMIZÁVEL ---
-// Edite este objeto para mudar completamente o formulário de briefing.
 const briefingConfig = {
-    modules: [
-        {
-            icon: "🎯",
-            title: "Objetivos Centrais",
-            fields: [
-                { id: "mainGoal", label: "Qual é o objetivo principal deste projeto?", type: "textarea", placeholder: "Ex: Desenvolver um novo dashboard para o time de operações.", help: "Seja específico. O que define o sucesso deste projeto?" },
-                { id: "mainProblem", label: "Qual problema estamos resolvendo?", type: "textarea", placeholder: "Ex: O time atual perde muito tempo consolidando relatórios manualmente.", help: "Descreva a 'dor' que o projeto vai curar." }
-            ]
-        },
-        {
-            icon: "👥",
-            title: "Público-Alvo e Stakeholders",
-            fields: [
-                { id: "targetAudience", label: "Quem é o público-alvo principal?", type: "text", placeholder: "Ex: Gestores de Operações.", help: "Para quem estamos fazendo isso?" },
-                { id: "stakeholders", label: "Quem são os stakeholders chave?", type: "text", placeholder: "Ex: Diretor de TI, Gerente de Produto.", help: "Quem precisa aprovar ou ser consultado?" }
-            ]
-        },
-        {
-            icon: "⚙️",
-            title: "Requisitos e Restrições",
-            fields: [
-                 { id: "coreFeatures", label: "Quais são as funcionalidades essenciais (MVP)?", type: "textarea", placeholder: "1. Visualização de dados em tempo real.\n2. Exportação para PDF.", help: "Liste o que é inegociável para o lançamento." },
-                 { id: "restrictions", label: "Existem restrições (orçamento, prazo, tecnologia)?", type: "textarea", placeholder: "Ex: O projeto deve ser concluído em 3 meses. Deve usar a stack de tecnologia atual da empresa.", help: "Quais são as nossas limitações?" }
-            ]
-        }
-    ]
+    modules: [{ icon: "🎯", title: "Objetivos Centrais", fields: [{ id: "mainGoal", label: "Qual é o objetivo principal deste projeto?", type: "textarea", help: "O que define o sucesso?" }, { id: "mainProblem", label: "Qual problema estamos resolvendo?", type: "textarea", help: "Descreva a 'dor' que o projeto vai curar." }] }, { icon: "👥", title: "Público-Alvo e Stakeholders", fields: [{ id: "targetAudience", label: "Quem é o público-alvo principal?", type: "text", help: "Para quem estamos fazendo isso?" }, { id: "stakeholders", label: "Quem são os stakeholders chave?", type: "text", help: "Quem precisa aprovar ou ser consultado?" }] }, { icon: "⚙️", title: "Requisitos e Restrições", fields: [{ id: "coreFeatures", label: "Funcionalidades essenciais (MVP)?", type: "textarea", help: "Liste o que é inegociável." }, { id: "restrictions", label: "Existem restrições (orçamento, prazo)?", type: "textarea", help: "Quais são as nossas limitações?" }] }]
 };
 
 document.addEventListener('DOMContentLoaded', function() {
-    // --- LÓGICA DA APLICAÇÃO ---
-    const briefingForm = document.getElementById('briefing-form');
-    const dynamicFormContent = document.getElementById('dynamic-form-content');
-    const overlay = document.getElementById('report-overlay');
-    const panel = document.getElementById('report-panel');
-    const closeBtn = document.getElementById('close-report-btn');
-    const copyBtn = document.getElementById('copy-report-btn');
-    const reportOutput = document.getElementById('report-output');
-    const reportTitle = document.getElementById('report-title');
+    const App = {
+        currentUser: null,
+        
+        init() {
+            this.addAuthListeners();
+            this.addAppListeners();
+            this.renderDynamicForm();
+        },
 
-    // --- Renderização do Formulário Dinâmico ---
-    function renderDynamicForm() {
-        let html = '';
-        briefingConfig.modules.forEach(module => {
-            html += `
-                <div class="form-section">
-                    <div class="section-header"><span class="icon">${module.icon}</span><h2>${module.title}</h2></div>
-                    <div class="section-body">`;
-            module.fields.forEach(field => {
-                html += `
-                    <div class="form-group">
-                        <label for="${field.id}">${field.label}</label>
-                        <small>${field.help}</small>`;
-                if (field.type === 'textarea') {
-                    html += `<textarea id="${field.id}" name="${field.id}" placeholder="${field.placeholder || ''}"></textarea>`;
-                } else { // 'text' ou 'select' etc.
-                    html += `<input type="text" id="${field.id}" name="${field.id}" placeholder="${field.placeholder || ''}">`;
+        showView(view) {
+            document.getElementById('auth-container').style.display = view === 'auth' ? 'flex' : 'none';
+            document.getElementById('app-container').style.display = view === 'app' ? 'block' : 'none';
+        },
+
+        addAuthListeners() {
+             auth.onAuthStateChanged(user => {
+                if (user) {
+                    this.currentUser = user;
+                    document.getElementById('user-email').textContent = user.email;
+                    this.showView('app');
+                } else {
+                    this.currentUser = null;
+                    this.showView('auth');
                 }
-                html += `</div>`;
             });
-            html += `</div></div>`;
-        });
-        dynamicFormContent.innerHTML = html;
-    }
+            
+            document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
+        },
 
-    // --- Lógica de Abas ---
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
-    tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            const tabId = button.dataset.tab;
-            tabContents.forEach(content => {
-                content.id === tabId ? content.classList.add('active') : content.classList.remove('active');
+        renderDynamicForm() {
+            let html = '';
+            briefingConfig.modules.forEach(m => {
+                html += `<div class="form-section"><div class="section-header"><h2>${m.icon} ${m.title}</h2></div><div class="section-body">`;
+                m.fields.forEach(f => {
+                    html += `<div class="form-group"><label for="${f.id}">${f.label}<small>${f.help}</small></label>`;
+                    if (f.type === 'textarea') html += `<textarea id="${f.id}" name="${f.id}"></textarea>`;
+                    else html += `<input type="text" id="${f.id}" name="${f.id}">`;
+                    html += `</div>`;
+                });
+                html += `</div></div>`;
             });
-        });
-    });
+            document.getElementById('dynamic-form-content').innerHTML = html;
+        },
 
-    // --- Geração de Briefing ---
-    briefingForm.addEventListener('submit', async function(event) {
-        event.preventDefault();
-        const userName = document.getElementById('userName').value.trim();
-        const projectName = document.getElementById('projectName').value.trim();
-        if (!userName || !projectName) {
-            alert("Por favor, preencha o seu Identificador e o Nome do Projeto.");
-            return;
+        addAppListeners() {
+            document.querySelectorAll('.tab-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.toggle('active', content.id === button.dataset.tab);
+                    });
+                });
+            });
+
+            document.getElementById('briefing-form').addEventListener('submit', (e) => this.handleBriefingSubmit(e));
+            document.getElementById('generate-prompt-btn').addEventListener('click', () => this.handlePromptGeneration());
+            
+            const overlay = document.getElementById('report-overlay');
+            document.getElementById('close-report-btn').addEventListener('click', () => this.togglePopup(false));
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) this.togglePopup(false); });
+            document.getElementById('copy-report-btn').addEventListener('click', (e) => this.copyReport(e.target));
+        },
+        
+        async handleBriefingSubmit(event) {
+            event.preventDefault();
+            if (!this.currentUser) { alert("Sessão expirada. Por favor, faça login novamente."); return; }
+            
+            const projectName = document.getElementById('projectName').value.trim();
+            if (!projectName) { alert("Por favor, preencha o Nome do Projeto."); return; }
+
+            const formData = new FormData(event.target);
+            let report = `📋 RELATÓRIO DE BRIEFING 📋\n\nProjeto: ${projectName}\nGerado em: ${new Date().toLocaleString('pt-BR')}\n========================\n\n`;
+            briefingConfig.modules.forEach(m => {
+                report += `--- ${m.title.toUpperCase()} ---\n`;
+                m.fields.forEach(f => {
+                    report += `▶ ${f.label}:\n${formData.get(f.id) || 'Não preenchido'}\n\n`;
+                });
+            });
+
+            this.showReport("Briefing Estratégico", report);
+
+            const briefingId = `${Date.now()}-${projectName.replace(/\s+/g, '-')}`;
+            try {
+                // CAMINHO ADAPTADO PARA AS REGRAS FORNECIDAS
+                await database.ref(`easy_lists/${this.currentUser.uid}/paineis_de_inteligencia/${briefingId}`).set({
+                    projectName: projectName,
+                    createdAt: new Date().toISOString(),
+                    content: report
+                });
+                 alert('Briefing salvo com sucesso!');
+            } catch (error) {
+                console.error("Erro ao salvar no Firebase: ", error);
+                alert("Houve um erro ao salvar o briefing. Verifique as regras do seu banco de dados.");
+            }
+        },
+        
+        handlePromptGeneration() {
+            const rawText = document.getElementById('rawText').value.trim();
+            const categories = document.getElementById('categories').value.trim();
+            if (!rawText || !categories) { alert("Preencha o texto bruto e as categorias."); return; }
+
+            let prompt = `**TAREFA DE ANÁLISE ESTRUTURADA**\n\n**OBJETIVO:** Extrair citações diretas (verbatim) do texto abaixo, organizando-as nas categorias especificadas. A fidelidade ao texto original é máxima.\n\n**REGRAS:**\n1.  **NÃO ALTERE, RESUMA OU PARAFRASEIE** o texto original. Copie as frases exatamente como estão.\n2.  Não corrija erros ou vícios de linguagem (ex: "né", "certo?").\n\n**CATEGORIAS:**\n- ${categories.split(',').map(c => c.trim()).join('\n- ')}\n\n**TEXTO BRUTO PARA ANÁLISE:**\n---\n${rawText}\n---\n\n**FORMATO DA SAÍDA:**\n`;
+            categories.split(',').forEach(c => { prompt += `**${c.trim()}**\n- [Citação 1]\n- [Citação 2]\n\n`; });
+            
+            this.showReport("Prompt de Análise Gerado", prompt);
+        },
+
+        togglePopup(show, title = '', content = '') {
+            const overlay = document.getElementById('report-overlay');
+            const panel = document.getElementById('report-panel');
+            if (show) {
+                document.getElementById('report-title').textContent = title;
+                document.getElementById('report-output').textContent = content;
+                overlay.style.display = 'flex';
+                setTimeout(() => {
+                    overlay.style.opacity = 1;
+                    panel.style.transform = 'scale(1)';
+                }, 10);
+            } else {
+                overlay.style.opacity = 0;
+                panel.style.transform = 'scale(0.95)';
+                setTimeout(() => { overlay.style.display = 'none'; }, 300);
+            }
+        },
+
+        showReport(title, content) {
+            this.togglePopup(true, title, content);
+        },
+
+        copyReport(button) {
+            const content = document.getElementById('report-output').textContent;
+            navigator.clipboard.writeText(content).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copiado!';
+                button.style.backgroundColor = '#2ecc71';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.backgroundColor = 'var(--success-color)';
+                }, 2000);
+            });
         }
+    };
 
-        const formData = new FormData(briefingForm);
-        let briefingReport = `📋 RELATÓRIO DE BRIEFING 📋\n\n`;
-        briefingReport += `Projeto: ${projectName}\n`;
-        briefingReport += `Gerado por: ${userName}\n`;
-        briefingReport += `Data: ${new Date().toLocaleString('pt-BR')}\n`;
-        briefingReport += "========================================\n\n";
-
-        briefingConfig.modules.forEach(module => {
-            briefingReport += `--- ${module.title.toUpperCase()} ---\n`;
-            module.fields.forEach(field => {
-                briefingReport += `▶ ${field.label}:\n`
-                briefingReport += `${formData.get(field.id) || 'Não preenchido'}\n\n`;
-            });
-        });
-
-        reportTitle.textContent = "Briefing Estratégico";
-        showReport(briefingReport);
-
-        // Salvar no Firebase
-        const briefingId = `${new Date().getTime()}-${projectName.replace(/\s+/g, '-')}`;
-        try {
-            await database.ref(`paineis-de-inteligencia/${userName}/${briefingId}`).set({
-                projectName: projectName,
-                createdAt: new Date().toISOString(),
-                content: briefingReport
-            });
-            console.log("Briefing salvo com sucesso no Firebase!");
-        } catch (error) {
-            console.error("Erro ao salvar no Firebase: ", error);
-            alert("Houve um erro ao salvar o briefing. Verifique o console.");
-        }
-    });
-
-    // --- Lógica do Sintetizador de Dados ---
-    document.getElementById('generate-prompt-btn').addEventListener('click', function() {
-        const rawText = document.getElementById('rawText').value.trim();
-        const categories = document.getElementById('categories').value.trim();
-
-        if (!rawText || !categories) {
-            alert("Por favor, preencha o texto bruto e as categorias.");
-            return;
-        }
-
-        let prompt = `**TAREFA DE ANÁLISE E ESTRUTURAÇÃO DE TEXTO**\n\n`;
-        prompt += `**OBJETIVO:** Analisar o texto bruto fornecido e extrair citações diretas (verbatim) que correspondam às categorias especificadas. A tarefa é de ORGANIZAÇÃO, não de sumarização ou reescrita.\n\n`;
-        prompt += `**REGRAS CRÍTICAS:**\n`;
-        prompt += `1.  **NÃO ALTERE O TEXTO ORIGINAL:** Copie e cole as frases ou parágrafos exatos do texto original. Não corrija erros gramaticais, gírias ou vícios de linguagem (como "né", "certo?"). A fidelidade ao original é máxima.\n`;
-        prompt += `2.  **NÃO RESUMA NEM PARAFRASEIE:** O objetivo é agrupar as informações como elas foram ditas, não interpretá-las.\n`;
-        prompt += `3.  Se um trecho se encaixar em mais de uma categoria, você pode repeti-lo.\n`;
-        prompt += `4.  Se nenhuma informação for encontrada para uma categoria, indique "Nenhuma informação encontrada nesta categoria."\n\n`;
-        prompt += `**CATEGORIAS PARA EXTRAÇÃO:**\n- ${categories.split(',').map(c => c.trim()).join('\n- ')}\n\n`;
-        prompt += `**TEXTO BRUTO PARA ANÁLISE:**\n---\n${rawText}\n---\n\n`;
-        prompt += `**FORMATO DA SAÍDA ESPERADA:**\n\n`;
-        prompt += `### Relatório de Síntese da Entrevista\n\n`;
-        categories.split(',').forEach(category => {
-            prompt += `**${category.trim()}**\n- [Citação 1 extraída do texto]\n- [Citação 2 extraída do texto]\n\n`;
-        });
-
-        reportTitle.textContent = "Prompt de Análise Gerado";
-        showReport(prompt);
-    });
-
-    // --- Funções do Painel de Relatório (Popup) ---
-    function showReport(content) {
-        reportOutput.textContent = content;
-        overlay.style.display = 'flex';
-        setTimeout(() => {
-            overlay.style.opacity = 1;
-            panel.style.transform = 'scale(1)';
-        }, 10);
-    }
-    
-    function closePanel() {
-        overlay.style.opacity = 0;
-        panel.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-            overlay.style.display = 'none';
-        }, 300);
-    }
-
-    closeBtn.addEventListener('click', closePanel);
-    overlay.addEventListener('click', (event) => { if (event.target === overlay) closePanel(); });
-
-    copyBtn.addEventListener('click', function() {
-        navigator.clipboard.writeText(reportOutput.textContent).then(() => {
-            copyBtn.textContent = 'Copiado com Sucesso!';
-            copyBtn.style.backgroundColor = '#16a085';
-            setTimeout(() => {
-                copyBtn.textContent = 'Copiar';
-                copyBtn.style.backgroundColor = 'var(--success-color)';
-            }, 2000);
-        }).catch(err => { console.error('Erro ao copiar: ', err); });
-    });
-
-    // --- Inicialização ---
-    renderDynamicForm();
+    App.init();
 });
 </script>
 </body>
