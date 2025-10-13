@@ -11,9 +11,15 @@
 
     <style>
         :root {
-            --primary-color: #2c3e50; --accent-color: #3498db; --dark-color: #222;
-            --light-color: #f4f6f8; --gray-color: #7f8c8d; --white-color: #ffffff;
-            --success-color: #27ae60; --danger-color: #e74c3c; --border-color: #dfe4ea;
+            --primary-color: #2c3e50; /* Azul Marinho Corporativo */
+            --accent-color: #3498db; /* Azul Brilhante para Ações */
+            --dark-color: #222;
+            --light-color: #f4f6f8; /* Fundo geral */
+            --gray-color: #7f8c8d;
+            --white-color: #ffffff;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --border-color: #dfe4ea;
             --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             --font-headings: 'Lato', var(--font-main);
         }
@@ -75,7 +81,7 @@
     <div id="app-container" class="main-container" style="display: none;">
         <header id="app-header">
             <div class="header-left">
-                <a href="index.html" class="back-btn"><span>&larr;</span> Voltar</a>
+                <a href="../../dashboard.html" class="back-btn"><span>&larr;</span> Voltar</a>
                 <h1>Diário de Bordo</h1>
             </div>
             <div id="user-info">
@@ -165,7 +171,7 @@
             showView(view) {
                 document.getElementById('loader-container').style.display = view === 'loader' ? 'block' : 'none';
                 document.getElementById('auth-container').style.display = view === 'auth' ? 'flex' : 'none';
-                document.getElementById('app-container').style.display = view === 'app' ? 'block' : 'none';
+                document.getElementById('app-container').style.display = view === 'app' ? 'none' : 'block';
             },
 
             addAuthListeners() {
